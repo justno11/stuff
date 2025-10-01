@@ -12,10 +12,10 @@
       --text: #e6e6e6;
       --muted: #b6b6b6;
       --line: #2a2a30;
-      --accent: #e11d48;   /* rose-600 */
-      --accent-2:#7f1d1d;  /* deep red brown */
-      --accent-3:#9f1239;  /* rose-700 */
-      --focus: #f43f5e;    /* rose-500 */
+      --accent: #e11d48;
+      --accent-2:#7f1d1d;
+      --accent-3:#9f1239;
+      --focus: #f43f5e;
       --ok: #16a34a;
       --warn: #f59e0b;
     }
@@ -42,9 +42,7 @@
       overflow: hidden;
     }
 
-    .shell{
-      padding: 20px;
-    }
+    .shell{ padding: 20px; }
 
     h1{
       font-size: 22px;
@@ -55,14 +53,12 @@
       border-bottom: 1px solid var(--line);
     }
 
-    /* Top meta header */
     .header{
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 12px;
       margin: 16px 0 8px 0;
     }
-
     .header.header-2{
       grid-template-columns: repeat(2, minmax(0, 1fr));
       margin-top: 8px;
@@ -120,10 +116,7 @@
     .stack{ margin-top: 10px; }
 
     /* Tabs */
-    .tabs{
-      margin-top: 14px;
-      border-top: 1px solid var(--line);
-    }
+    .tabs{ margin-top: 14px; border-top: 1px solid var(--line); }
     .tab-nav{
       display:flex;
       gap: 6px;
@@ -206,9 +199,7 @@
       text-align: center;
       padding: 6px 6px;
     }
-    .battles-table input[type="checkbox"]{
-      transform: scale(1.2);
-    }
+    .battles-table input[type="checkbox"]{ transform: scale(1.2); }
 
     .outcome{
       display: flex;
@@ -247,11 +238,48 @@
     .btn:hover{ filter: brightness(1.05); box-shadow: 0 10px 20px rgba(225,29,72,.20); }
     .btn:active{ transform: translateY(1px); }
 
-    /* Small helpers for full-width inputs inside blocks */
     .full-width-label{ display:block; margin: 8px 0 6px; color: var(--muted); font-size: 12px; }
     .full-width-input{ width: 100%; }
 
-    /* Make it roomier on large screens */
+    /* Collapsible JSON panel */
+    details.json-io{
+      border-top: 1px solid var(--line);
+      background: #0f0f13;
+    }
+    details.json-io > summary{
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+      padding: 14px 20px;
+      font-weight: 700;
+      color: #ffd7dd;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    details.json-io > summary::before{
+      content: "▶";
+      font-size: 12px;
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+    details.json-io[open] > summary::before{ content: "▼"; }
+    .json-io-body{
+      padding: 0 20px 20px;
+      display: grid;
+      gap: 10px;
+    }
+    #json-io-text{
+      min-height: 260px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      line-height: 1.35;
+      resize: vertical;
+      background: #0c0c10;
+    }
+    .json-io-actions{
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+
     @media (min-width: 1200px){
       .shell{ padding: 24px 24px 8px; }
     }
@@ -281,29 +309,26 @@
           <button class="tab-btn" data-tab="campaign">Campaign</button>
         </div>
 
-        <!-- TAB 1: Roster (Leader moved directly above Followers) -->
+        <!-- TAB 1: Roster -->
         <div class="tab-content active" id="tab-roster">
           <div class="section-title">Leader</div>
-<div class="leader-details">
-  <div class="leader-grid">
-    <div class="field"><label>Quality</label><input type="text" id="leader-quality"></div>
-    <div class="field"><label>Status (Detail)</label><input type="text" id="leader-status-detail"></div>
-    <div class="field"><label>Cost</label><input type="text" id="leader-cost"></div>
-    <!-- removed Skill/Ability from the grid -->
-  </div>
+          <div class="leader-details">
+            <div class="leader-grid">
+              <div class="field"><label>Quality</label><input type="text" id="leader-quality"></div>
+              <div class="field"><label>Status (Detail)</label><input type="text" id="leader-status-detail"></div>
+              <div class="field"><label>Cost</label><input type="text" id="leader-cost"></div>
+            </div>
+            <div class="stack">
+              <label for="leader-skill" class="full-width-label">Skill</label>
+              <input type="text" id="leader-skill" class="full-width-input" placeholder="Leader skill">
 
-  <!-- full-width lines like Followers -->
-  <div class="stack">
-    <label for="leader-skill" class="full-width-label">Skill</label>
-    <input type="text" id="leader-skill" class="full-width-input" placeholder="Leader skill">
+              <label for="leader-ability" class="full-width-label">Ability</label>
+              <textarea id="leader-ability" class="full-width-input" placeholder="Leader ability"></textarea>
 
-    <label for="leader-ability" class="full-width-label">Ability</label>
-    <textarea id="leader-ability" class="full-width-input" placeholder="Leader ability"></textarea>
-
-    <label for="leader-gear" class="full-width-label">Gear</label>
-    <textarea id="leader-gear" rows="2" class="full-width-input" placeholder="Leader gear"></textarea>
-  </div>
-</div>
+              <label for="leader-gear" class="full-width-label">Gear</label>
+              <textarea id="leader-gear" rows="2" class="full-width-input" placeholder="Leader gear"></textarea>
+            </div>
+          </div>
 
           <div class="section-title">Followers</div>
 
@@ -319,7 +344,8 @@
             <div class="stack">
               <label for="follower1-skill" class="full-width-label">Skill</label>
               <input type="text" id="follower1-skill" class="full-width-input">
-              <label for="follower1-ability" class="full-width-label">Ability</label>    <textarea id="follower1-ability" rows="2" class="full-width-input" placeholder="Ability"></textarea>
+              <label for="follower1-ability" class="full-width-label">Ability</label>
+              <textarea id="follower1-ability" rows="2" class="full-width-input" placeholder="Ability"></textarea>
               <label for="follower1-gear" class="full-width-label">Gear</label>
               <textarea id="follower1-gear" rows="2" class="full-width-input"></textarea>
             </div>
@@ -337,7 +363,7 @@
               <label for="follower2-skill" class="full-width-label">Skill</label>
               <input type="text" id="follower2-skill" class="full-width-input">
               <label for="follower2-ability" class="full-width-label">Ability</label>
-<textarea id="follower2-ability" rows="2" class="full-width-input" placeholder="Ability"></textarea>
+              <textarea id="follower2-ability" rows="2" class="full-width-input" placeholder="Ability"></textarea>
               <label for="follower2-gear" class="full-width-label">Gear</label>
               <textarea id="follower2-gear" rows="2" class="full-width-input"></textarea>
             </div>
@@ -355,7 +381,7 @@
               <label for="follower3-skill" class="full-width-label">Skill</label>
               <input type="text" id="follower3-skill" class="full-width-input">
               <label for="follower3-ability" class="full-width-label">Ability</label>
-<textarea id="follower3-ability" rows="2" class="full-width-input" placeholder="Ability"></textarea>
+              <textarea id="follower3-ability" rows="2" class="full-width-input" placeholder="Ability"></textarea>
               <label for="follower3-gear" class="full-width-label">Gear</label>
               <textarea id="follower3-gear" rows="2" class="full-width-input"></textarea>
             </div>
@@ -373,7 +399,7 @@
               <label for="follower4-skill" class="full-width-label">Skill</label>
               <input type="text" id="follower4-skill" class="full-width-input">
               <label for="follower4-ability" class="full-width-label">Ability</label>
-<textarea id="follower4-ability" rows="2" class="full-width-input" placeholder="Ability"></textarea>
+              <textarea id="follower4-ability" rows="2" class="full-width-input" placeholder="Ability"></textarea>
               <label for="follower4-gear" class="full-width-label">Gear</label>
               <textarea id="follower4-gear" rows="2" class="full-width-input"></textarea>
             </div>
@@ -391,7 +417,7 @@
               <label for="follower5-skill" class="full-width-label">Skill</label>
               <input type="text" id="follower5-skill" class="full-width-input">
               <label for="follower5-ability" class="full-width-label">Ability</label>
-<textarea id="follower5-ability" rows="2" class="full-width-input" placeholder="Ability"></textarea>
+              <textarea id="follower5-ability" rows="2" class="full-width-input" placeholder="Ability"></textarea>
               <label for="follower5-gear" class="full-width-label">Gear</label>
               <textarea id="follower5-gear" rows="2" class="full-width-input"></textarea>
             </div>
@@ -409,14 +435,14 @@
               <label for="follower6-skill" class="full-width-label">Skill</label>
               <input type="text" id="follower6-skill" class="full-width-input">
               <label for="follower6-ability" class="full-width-label">Ability</label>
-<textarea id="follower6-ability" rows="2" class="full-width-input" placeholder="Ability"></textarea>
+              <textarea id="follower6-ability" rows="2" class="full-width-input" placeholder="Ability"></textarea>
               <label for="follower6-gear" class="full-width-label">Gear</label>
               <textarea id="follower6-gear" rows="2" class="full-width-input"></textarea>
             </div>
           </div>
         </div>
 
-        <!-- TAB 2: Campaign (Ambitions, Battles, Climax moved here) -->
+        <!-- TAB 2: Campaign -->
         <div class="tab-content" id="tab-campaign">
           <div class="section-title">Leader Ambitions</div>
           <div class="ambitions">
@@ -436,7 +462,6 @@
               <input type="checkbox" id="ambition-check4">
               <input type="text" id="ambition-text4" placeholder="Ambition 4">
             </div>
-            <!-- NEW: Ambitions 5 & 6 -->
             <div class="amb-row">
               <input type="checkbox" id="ambition-check5">
               <input type="text" id="ambition-text5" placeholder="Ambition 5">
@@ -515,6 +540,20 @@
       </label>
       <button id="import-btn" class="btn">Import from JSON</button>
     </div>
+
+    <!-- Collapsible JSON Text I/O -->
+    <details class="json-io">
+      <summary>JSON Import/Export (No file picker)</summary>
+      <div class="json-io-body">
+        <textarea id="json-io-text" placeholder='Paste JSON here to import, or click "Export to Box" to dump current data...'></textarea>
+        <div class="json-io-actions">
+          <button id="export-to-box-btn" class="btn">Export to Box</button>
+          <button id="copy-box-btn" class="btn">Copy to Clipboard</button>
+          <button id="import-from-box-btn" class="btn">Import from Box</button>
+          <button id="clear-box-btn" class="btn">Clear Box</button>
+        </div>
+      </div>
+    </details>
   </div>
 
   <!-- libs -->
@@ -541,7 +580,7 @@
       }catch(e){}
     })();
 
-    // -------- Export PDF (captures current visible tab + header) --------
+    // -------- PDF export --------
     document.getElementById('export-btn').addEventListener('click', exportToPDF);
     function exportToPDF(){
       const target = document.getElementById('warband-sheet');
@@ -568,9 +607,8 @@
       });
     }
 
-    // -------- Export JSON (UPDATED: ambitions 1..6) --------
-    document.getElementById('export-json-btn').addEventListener('click', exportToJSON);
-    function exportToJSON(){
+    // ===== JSON helpers =====
+    function collectData(){
       const ambitions = [];
       for(let i=1;i<=6;i++){
         ambitions.push({
@@ -578,7 +616,6 @@
           text:  document.getElementById(`ambition-text${i}`).value
         });
       }
-
       const data = {
         player: document.getElementById('player').value,
         warband: document.getElementById('warband').value,
@@ -628,78 +665,118 @@
           gear: document.getElementById(`follower${i}-gear`).value
         });
       }
+      return data;
+    }
 
-      const jsonString = JSON.stringify(data, null, 2);
+    function populateFromData(data){
+      document.getElementById('player').value = data.player || '';
+      document.getElementById('warband').value = data.warband || '';
+      document.getElementById('faction').value = data.faction || '';
+      document.getElementById('leader').value = data.leader?.name || '';
+      document.getElementById('leader-class').value = data.leader?.class || '';
+      document.getElementById('leader-status').value = data.leader?.status || '';
+      document.getElementById('leader-renown').value = data.leader?.renown || '';
+      document.getElementById('leader-skill').value = data.leader?.skill || '';
+      document.getElementById('leader-ability').value = data.leader?.ability || '';
+      document.getElementById('leader-quality').value = data.leader?.quality || '';
+      document.getElementById('leader-status-detail').value = data.leader?.status_detail || '';
+      document.getElementById('leader-gear').value = data.leader?.gear || '';
+      document.getElementById('leader-cost').value = data.leader?.cost || '';
+
+      for(let i=1;i<=6;i++){
+        const a = data.ambitions?.[i-1] || {};
+        document.getElementById(`ambition-check${i}`).checked = !!a.check;
+        document.getElementById(`ambition-text${i}`).value = a.text || '';
+      }
+
+      for(let i=1;i<=19;i++){
+        document.getElementById(`horror${i}`).value = data.battles?.horror?.[i-1] || '';
+        document.getElementById(`conflict${i}`).value = data.battles?.conflict?.[i-1] || '';
+        document.getElementById(`event${i}`).value = data.battles?.event?.[i-1] || '';
+        document.getElementById(`renown${i}`).checked = !!(data.battles?.renown?.[i-1]);
+        document.getElementById(`prestige${i}`).checked = !!(data.battles?.prestige?.[i-1]);
+      }
+      document.getElementById('horrorClimax').value = data.battles?.horror?.[19] || '';
+      document.getElementById('conflictClimax').value = data.battles?.conflict?.[19] || '';
+      document.getElementById('eventClimax').value = data.battles?.event?.[19] || '';
+      document.getElementById('renownClimax').checked = !!(data.battles?.renown?.[19]);
+      document.getElementById('prestigeClimax').checked = !!(data.battles?.prestige?.[19]);
+      document.getElementById('scenario-role').value = data.climax?.scenario_role || '';
+
+      for(let i=1;i<=6;i++){
+        const f = data.followers?.[i-1] || {};
+        document.getElementById(`follower${i}-follower`).value = f.follower || '';
+        document.getElementById(`follower${i}-class`).value = f.class || '';
+        document.getElementById(`follower${i}-quality`).value = f.quality || '';
+        document.getElementById(`follower${i}-status`).value = f.status || '';
+        document.getElementById(`follower${i}-cost`).value = f.cost || '';
+        document.getElementById(`follower${i}-skill`).value = f.skill || '';
+        document.getElementById(`follower${i}-ability`).value = f.ability || '';
+        document.getElementById(`follower${i}-gear`).value = f.gear || '';
+      }
+
+      document.getElementById('outcome').value = data.outcome || 'Victorious';
+      document.getElementById('total').value = data.total || '';
+
+      // If file had campaign data, jump there
+      if((data?.battles?.horror?.length || 0) > 0){ setTab('campaign'); }
+    }
+
+    // -------- File-based JSON export/import (unchanged) --------
+    document.getElementById('export-json-btn').addEventListener('click', () => {
+      const jsonString = JSON.stringify(collectData(), null, 2);
       const blob = new Blob([jsonString], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url; a.download = 'warband.json'; a.click();
       URL.revokeObjectURL(url);
-    }
+    });
 
-    // -------- Import JSON (UPDATED: ambitions 1..6, still backwards compatible) --------
-    document.getElementById('import-btn').addEventListener('click', importFromJSON);
-    function importFromJSON(){
+    document.getElementById('import-btn').addEventListener('click', () => {
       const file = document.getElementById('import-file').files[0];
       if(!file) return;
       const reader = new FileReader();
       reader.onload = (e) => {
-        const data = JSON.parse(e.target.result || '{}');
-        document.getElementById('player').value = data.player || '';
-        document.getElementById('warband').value = data.warband || '';
-        document.getElementById('faction').value = data.faction || '';
-        document.getElementById('leader').value = data.leader?.name || '';
-        document.getElementById('leader-class').value = data.leader?.class || '';
-        document.getElementById('leader-status').value = data.leader?.status || '';
-        document.getElementById('leader-renown').value = data.leader?.renown || '';
-        document.getElementById('leader-skill').value = data.leader?.skill || '';
-        document.getElementById('leader-ability').value = data.leader?.ability || '';
-        document.getElementById('leader-quality').value = data.leader?.quality || '';
-        document.getElementById('leader-status-detail').value = data.leader?.status_detail || '';
-        document.getElementById('leader-gear').value = data.leader?.gear || '';
-        document.getElementById('leader-cost').value = data.leader?.cost || '';
-
-        // Ambitions: now 1..6; old files with 4 will still work
-        for(let i=1;i<=6;i++){
-          const a = data.ambitions?.[i-1] || {};
-          document.getElementById(`ambition-check${i}`).checked = !!a.check;
-          document.getElementById(`ambition-text${i}`).value = a.text || '';
+        try{
+          const data = JSON.parse(e.target.result || '{}');
+          populateFromData(data);
+        }catch(err){
+          alert('Could not parse JSON file. Please check the content.');
         }
-
-        for(let i=1;i<=19;i++){
-          document.getElementById(`horror${i}`).value = data.battles?.horror?.[i-1] || '';
-          document.getElementById(`conflict${i}`).value = data.battles?.conflict?.[i-1] || '';
-          document.getElementById(`event${i}`).value = data.battles?.event?.[i-1] || '';
-          document.getElementById(`renown${i}`).checked = !!(data.battles?.renown?.[i-1]);
-          document.getElementById(`prestige${i}`).checked = !!(data.battles?.prestige?.[i-1]);
-        }
-        document.getElementById('horrorClimax').value = data.battles?.horror?.[19] || '';
-        document.getElementById('conflictClimax').value = data.battles?.conflict?.[19] || '';
-        document.getElementById('eventClimax').value = data.battles?.event?.[19] || '';
-        document.getElementById('renownClimax').checked = !!(data.battles?.renown?.[19]);
-        document.getElementById('prestigeClimax').checked = !!(data.battles?.prestige?.[19]);
-        document.getElementById('scenario-role').value = data.climax?.scenario_role || '';
-
-        for(let i=1;i<=6;i++){
-          const f = data.followers?.[i-1] || {};
-          document.getElementById(`follower${i}-follower`).value = f.follower || '';
-          document.getElementById(`follower${i}-class`).value = f.class || '';
-          document.getElementById(`follower${i}-quality`).value = f.quality || '';
-          document.getElementById(`follower${i}-status`).value = f.status || '';
-          document.getElementById(`follower${i}-cost`).value = f.cost || '';
-          document.getElementById(`follower${i}-skill`).value = f.skill || '';
-          document.getElementById(`follower${i}-ability`).value = f.ability || '';
-          document.getElementById(`follower${i}-gear`).value = f.gear || '';
-        }
-
-        document.getElementById('outcome').value = data.outcome || 'Victorious';
-        document.getElementById('total').value = data.total || '';
-
-        // Optional: jump to Campaign tab if the file contained battles/ambitions
-        if((data?.battles?.horror?.length || 0) > 0){ setTab('campaign'); }
       };
       reader.readAsText(file);
-    }
+    });
+
+    // -------- Textarea JSON I/O (no file picker) --------
+    const detailsBox = document.querySelector('details.json-io');
+    const jsonBox = document.getElementById('json-io-text');
+    document.getElementById('export-to-box-btn').addEventListener('click', () => {
+      const jsonString = JSON.stringify(collectData(), null, 2);
+      jsonBox.value = jsonString;
+      detailsBox.open = true;
+    });
+    document.getElementById('copy-box-btn').addEventListener('click', async () => {
+      try{
+        await navigator.clipboard.writeText(jsonBox.value || '');
+        alert('JSON copied to clipboard');
+      }catch(e){
+        alert('Clipboard not available. Select and copy manually.');
+      }
+    });
+    document.getElementById('import-from-box-btn').addEventListener('click', () => {
+      const text = jsonBox.value.trim();
+      if(!text){ alert('Paste JSON into the box first.'); return; }
+      try{
+        const data = JSON.parse(text);
+        populateFromData(data);
+        alert('Imported from box successfully.');
+      }catch(err){
+        alert('Invalid JSON in the box. Please check your content.');
+      }
+    });
+    document.getElementById('clear-box-btn').addEventListener('click', () => {
+      jsonBox.value = '';
+    });
   </script>
 </body>
 </html>
