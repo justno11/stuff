@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Smacked Down! Wrestler Sheets (Tabbed)</title>
+<style>
+  :root{
+    --bg:#0f1220;
+    --panel:#151a2c;
+    --ink:#e9edff;
+    --muted:#9aa3c1;
+    --line:#27304a;
+    --accent:#6aa3ff;
+    --accent-d:#4d83e6;
+    --radius:12px;
+    --gap:14px;
+    --input-h:40px;
+    --shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#f5f6f8; --panel:#ffffff; --ink:#101222; --muted:#5a637b; --line:#d7d9e3; --accent:#2b6cff; --accent-d:#1e53c7; --shadow:0 8px 24px rgba(16,18,34,.08); }
+  }
+
+  html,body{height:100%}
+  body{
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";
+    background: radial-gradient(1200px 800px at 20% -10%, #1a2140 0%, rgba(26,33,64,0) 60%) , var(--bg);
+    color: var(--ink);
+    margin: 0;
+    line-height: 1.35;
+    padding: clamp(12px,2vw,24px);
+  }
+
+  /* Tabs */
+  .tabs{
+    max-width: min(1080px,100%);
+    margin: 0 auto 12px;
+    display: flex;
+    border:1px solid var(--line);
+    border-radius:12px;
+    overflow:hidden;
+    background:#0f1532;
+  }
+  .tab-btn{
+    flex:1;
+    padding:12px 14px;
+    cursor:pointer;
+    text-align:center;
+    color:var(--ink);
+    background:#0f1532;
+    border:none;
+    font-weight:700;
+    letter-spacing:.3px;
+  }
+  .tab-btn:not(.active):hover{ background:#12193a; }
+  .tab-btn.active{
+    background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,0)) , var(--panel);
+    color:var(--ink);
+    box-shadow: inset 0 -2px 0 var(--accent);
+  }
+
+  .sheet-wrap{ max-width: min(1080px, 100%); margin-inline:auto; }
+  .sheet{ display:none; }
+  .sheet.active{ display:block; }
+
+  /* Card/sheet base */
+  .card{
+    background: #11172b;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px;
+  }
+  .panel{
+    background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0)) , var(--panel);
+    padding: clamp(16px,2.2vw,24px);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+  }
+  h1{ font-size: clamp(1.25rem, 2.4vw, 1.8rem); margin: 0 0 12px; letter-spacing:.2px; }
+  .sub{ color:var(--muted); font-size:.95rem; margin-top:-2px; }
+  .section{ margin-block: 18px; }
+  .section-title{
+    font-weight: 600; margin-bottom: 10px; color: var(--muted);
+    letter-spacing:.2px; text-transform: uppercase; font-size: .9rem;
+  }
+
+  /* Layout helpers */
+  .grid{ display:grid; gap: var(--gap); }
+  .grid.cols-2{ grid-template-columns: 1fr; }
+  .grid.cols-3{ grid-template-columns: 1fr; }
+  .grid.cols-4{ grid-template-columns: 1fr; }
+  @media (min-width: 560px){
+    .grid.cols-2{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .grid.cols-3{ grid-template-columns: repeat(3, minmax(0,1fr)); }
+    .grid.cols-4{ grid-template-columns: repeat(4, minmax(0,1fr)); }
+  }
+  .field{ display:flex; flex-direction: column; gap:6px; min-width:0; }
+  label{ font-size:.9rem; color:var(--muted); }
+
+  /* Inputs */
+  input[type="text"], input[type="number"], textarea, select{
+    height: var(--input-h);
+    padding: 10px 12px;
+    border:1px solid var(--line); border-radius:10px;
+    background:#0e1430; color: var(--ink);
+    outline: none; width:100%; box-sizing: border-box;
+    transition: border .15s ease, box-shadow .15s ease;
+  }
+  textarea{ min-height: 68px; height:auto; resize: vertical; line-height:1.25; }
+  input::placeholder, textarea::placeholder{ color:#7683ab; }
+  input:focus, textarea:focus, select:focus{
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(106,163,255,.15);
+  }
+  .pair{ display:grid; grid-template-columns: 1fr 1fr; gap:8px; }
+  .hint{ color:var(--muted); font-size:.85rem; margin-top:6px; }
+
+  /* Stats (one line) */
+  .stat-list{ display:grid; gap:10px; }
+  @media (min-width:680px){ .stat-list{ grid-template-columns: repeat(2,minmax(0,1fr)); } }
+  @media (min-width:920px){ .stat-list{ grid-template-columns: repeat(3,minmax(0,1fr)); } }
+  .stat-line{
+    display:flex; align-items:center; gap:10px;
+    background:#0e1430; border:1px solid var(--line);
+    border-radius:10px; padding:8px 10px;
+  }
+  .stat-label{ width: 110px; min-width:110px; color:var(--ink); font-weight:600; }
+  .stat-line input{ height:34px; padding:6px 8px; border-radius:8px; background:#0d142e; border:1px solid var(--line); color:var(--ink); }
+  .stat-value{ width:44px; text-align:center; }
+  .stat-mod{ width:60px; text-align:center; }
+
+  /* Moves */
+  .moves-grid{ display:grid; gap:10px; }
+  @media (min-width:680px){ .moves-grid{ grid-template-columns: repeat(2,minmax(0,1fr)); } }
+  @media (min-width:980px){ .moves-grid{ grid-template-columns: repeat(3,minmax(0,1fr)); } }
+  .move-card{
+    background:#0f1532; border:1px solid var(--line);
+    border-radius:12px; padding:10px; display:flex; flex-direction:column; gap:8px;
+  }
+  .move-top{ display:flex; flex-direction:column; gap:8px; }
+  .move-bottom{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .mini{
+    display:flex; align-items:center; gap:6px;
+    background:#0d142e; border:1px solid var(--line);
+    padding:6px 8px; border-radius:8px;
+  }
+  .mini label{ color:var(--muted); font-size:.8rem; }
+  .mini input{ height:30px; width:64px; text-align:center; padding:4px 6px; background:#0b1230; border:1px solid var(--line); border-radius:6px; color:var(--ink); }
+
+  /* Controls */
+  .controls{
+    display:flex; flex-wrap: wrap; gap:10px; justify-content:center; margin-top:18px;
+  }
+  .btn{
+    appearance:none; border:none; background: var(--accent); color:#0d142e;
+    padding: 10px 16px; border-radius: 10px; cursor: pointer; font-weight:700;
+    letter-spacing:.2px; box-shadow: 0 10px 26px rgba(106,163,255,.22);
+    transition: transform .05s ease, background .15s ease, opacity .15s ease;
+  }
+  .btn:hover{ background: var(--accent-d); }
+  .btn:active{ transform: translateY(1px); }
+  .btn.alt{ background:#1f2744; color:var(--ink); border:1px solid var(--line); box-shadow:none; }
+  .btn.ghost{ background:transparent; color:var(--ink); border:1px dashed var(--line); box-shadow:none; }
+
+  input[type="file"]{ display:block; margin-inline:auto; max-width: 320px; color: var(--ink); }
+
+  @media print{
+    body{ background:#fff; padding:0; }
+    .tabs, .controls{ display:none !important; }
+    .panel{ border:none; box-shadow:none; max-width: 100%; padding: 10mm; background:#fff; color:#000; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Tabs -->
+  <div class="tabs" role="tablist" aria-label="Wrestler tabs">
+    <button class="tab-btn active" id="tab-w1" role="tab" aria-controls="sheet-w1" aria-selected="true">Wrestler A</button>
+    <button class="tab-btn" id="tab-w2" role="tab" aria-controls="sheet-w2" aria-selected="false">Wrestler B</button>
+  </div>
+
+  <div class="sheet-wrap">
+    <!-- Wrestler A -->
+    <section id="sheet-w1" class="sheet active">
+      <div class="panel" id="panel-w1">
+        <h1>Smacked Down! Wrestler Sheet</h1>
+        <div class="sub">Wrestler A</div>
+
+        <!-- Header -->
+        <div class="section card">
+          <div class="grid cols-3">
+            <div class="field"><label for="w1-wrestler-name">Wrestler's Name</label><input type="text" id="w1-wrestler-name" placeholder="Ring name" /></div>
+            <div class="field"><label for="w1-archetype">Archetype</label><input type="text" id="w1-archetype" placeholder="Brawler, Technician, High-Flyer..." /></div>
+            <div class="field"><label for="w1-size">Size</label><input type="text" id="w1-size" placeholder="Light, Medium, Heavy..." /></div>
+          </div>
+          <div class="grid cols-3" style="margin-top: var(--gap);">
+            <div class="field"><label for="w1-movement">Movement</label><input type="text" id="w1-movement" placeholder="e.g., 6" /></div>
+            <div class="field"><label>HP</label><div class="pair"><input type="number" id="w1-hp-current" placeholder="Current" min="0" /><input type="number" id="w1-hp-total" placeholder="Total" min="0" /></div></div>
+            <div class="field"><label>AP</label><div class="pair"><input type="number" id="w1-ap-current" placeholder="Current" min="0" /><input type="number" id="w1-ap-total" placeholder="Total" min="0" /></div></div>
+          </div>
+          <div class="grid cols-3" style="margin-top: var(--gap);">
+            <div class="field"><label for="w1-hmp">HMP</label><input type="number" id="w1-hmp" placeholder="Heat Momentum Points" min="0" /></div>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="section card">
+          <div class="section-title">Stats</div>
+          <div class="stat-list">
+            <div class="stat-line"><div class="stat-label">Strength</div><input type="number" id="w1-stat-strength" class="stat-value" placeholder="V" /><input type="number" id="w1-mod-strength" class="stat-mod" placeholder="Mod" /></div>
+            <div class="stat-line"><div class="stat-label">Toughness</div><input type="number" id="w1-stat-toughness" class="stat-value" placeholder="V" /><input type="number" id="w1-mod-toughness" class="stat-mod" placeholder="Mod" /></div>
+            <div class="stat-line"><div class="stat-label">Agility</div><input type="number" id="w1-stat-agility" class="stat-value" placeholder="V" /><input type="number" id="w1-mod-agility" class="stat-mod" placeholder="Mod" /></div>
+            <div class="stat-line"><div class="stat-label">Ring IQ</div><input type="number" id="w1-stat-ringiq" class="stat-value" placeholder="V" /><input type="number" id="w1-mod-ringiq" class="stat-mod" placeholder="Mod" /></div>
+            <div class="stat-line"><div class="stat-label">Promo</div><input type="number" id="w1-stat-promo" class="stat-value" placeholder="V" /><input type="number" id="w1-mod-promo" class="stat-mod" placeholder="Mod" /></div>
+          </div>
+          <div class="hint">Value is single digit, modifier is up to two digits</div>
+        </div>
+
+        <!-- Moves -->
+        <div class="section">
+          <div class="section-title">Moves</div>
+          <div class="moves-grid" id="w1-moves-grid"></div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn" onclick="exportToPDF('panel-w1','wrestler-a.pdf')">Export A to PDF</button>
+        <button class="btn" onclick="exportToJSON('w1')">Export A to JSON</button>
+        <input type="file" id="w1-file-input" accept=".json" />
+        <button class="btn alt" onclick="importFromJSON('w1')">Import A from JSON</button>
+        <button class="btn ghost" onclick="exportBoth()">Export BOTH to JSON</button>
+      </div>
+    </section>
+
+    <!-- Wrestler B -->
+    <section id="sheet-w2" class="sheet">
+      <div class="panel" id="panel-w2">
+        <h1>Smacked Down! Wrestler Sheet</h1>
+        <div class="sub">Wrestler B</div>
+
+        <div class="section card">
+          <div class="grid cols-3">
+            <div class="field"><label for="w2-wrestler-name">Wrestler's Name</label><input type="text" id="w2-wrestler-name" placeholder="Ring name" /></div>
+            <div class="field"><label for="w2-archetype">Archetype</label><input type="text" id="w2-archetype" placeholder="Brawler, Technician, High-Flyer..." /></div>
+            <div class="field"><label for="w2-size">Size</label><input type="text" id="w2-size" placeholder="Light, Medium, Heavy..." /></div>
+          </div>
+          <div class="grid cols-3" style="margin-top: var(--gap);">
+            <div class="field"><label for="w2-movement">Movement</label><input type="text" id="w2-movement" placeholder="e.g., 6" /></div>
+            <div class="field"><label>HP</label><div class="pair"><input type="number" id="w2-hp-current" placeholder="Current" min="0" /><input type="number" id="w2-hp-total" placeholder="Total" min="0" /></div></div>
+            <div class="field"><label>AP</label><div class="pair"><input type="number" id="w2-ap-current" placeholder="Current" min="0" /><input type="number" id="w2-ap-total" placeholder="Total" min="0" /></div></div>
+          </div>
+          <div class="grid cols-3" style="margin-top: var(--gap);">
+            <div class="field"><label for="w2-hmp">HMP</label><input type="number" id="w2-hmp" placeholder="Heat Momentum Points" min="0" /></div>
+          </div>
+        </div>
+
+        <div class="section card">
+          <div class="section-title">Stats</div>
+          <div class="stat-list">
+            <div class="stat-line"><div class="stat-label">Strength</div><input type="number" id="w2-stat-strength" class="stat-value" placeholder="V" /><input type="number" id="w2-mod-strength" class="stat-mod" placeholder="Mod" /></div>
+            <div class="stat-line"><div class="stat-label">Toughness</div><input type="number" id="w2-stat-toughness" class="stat-value" placeholder="V" /><input type="number" id="w2-mod-toughness" class="stat-mod" placeholder="Mod" /></div>
+            <div class="stat-line"><div class="stat-label">Agility</div><input type="number" id="w2-stat-agility" class="stat-value" placeholder="V" /><input type="number" id="w2-mod-agility" class="stat-mod" placeholder="Mod" /></div>
+            <div class="stat-line"><div class="stat-label">Ring IQ</div><input type="number" id="w2-stat-ringiq" class="stat-value" placeholder="V" /><input type="number" id="w2-mod-ringiq" class="stat-mod" placeholder="Mod" /></div>
+            <div class="stat-line"><div class="stat-label">Promo</div><input type="number" id="w2-stat-promo" class="stat-value" placeholder="V" /><input type="number" id="w2-mod-promo" class="stat-mod" placeholder="Mod" /></div>
+          </div>
+          <div class="hint">Value is single digit, modifier is up to two digits</div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Moves</div>
+          <div class="moves-grid" id="w2-moves-grid"></div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn" onclick="exportToPDF('panel-w2','wrestler-b.pdf')">Export B to PDF</button>
+        <button class="btn" onclick="exportToJSON('w2')">Export B to JSON</button>
+        <input type="file" id="w2-file-input" accept=".json" />
+        <button class="btn alt" onclick="importFromJSON('w2')">Import B from JSON</button>
+        <button class="btn ghost" onclick="exportBoth()">Export BOTH to JSON</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    const MOVE_COUNT = 7;
+
+    // Tab logic
+    const tabW1 = document.getElementById('tab-w1');
+    const tabW2 = document.getElementById('tab-w2');
+    const sheetW1 = document.getElementById('sheet-w1');
+    const sheetW2 = document.getElementById('sheet-w2');
+
+    tabW1.addEventListener('click', () => setActive('w1'));
+    tabW2.addEventListener('click', () => setActive('w2'));
+
+    function setActive(prefix){
+      const isW1 = prefix === 'w1';
+      tabW1.classList.toggle('active', isW1);
+      tabW2.classList.toggle('active', !isW1);
+      tabW1.setAttribute('aria-selected', String(isW1));
+      tabW2.setAttribute('aria-selected', String(!isW1));
+      sheetW1.classList.toggle('active', isW1);
+      sheetW2.classList.toggle('active', !isW1);
+    }
+
+    // Build move cards for each wrestler
+    buildMoves('w1');
+    buildMoves('w2');
+
+    function buildMoves(prefix){
+      const grid = document.getElementById(`${prefix}-moves-grid`);
+      const cards = [];
+      for(let i=1;i<=MOVE_COUNT;i++){
+        cards.push(`
+          <div class="move-card">
+            <div class="move-top">
+              <input type="text" id="${prefix}-move-name-${i}" placeholder="Move ${i} name" />
+              <input type="text" id="${prefix}-move-desc-${i}" placeholder="Description / conditions / tags" />
+            </div>
+            <div class="move-bottom">
+              <div class="mini">
+                <label for="${prefix}-move-ap-${i}">AP</label>
+                <input type="number" id="${prefix}-move-ap-${i}" placeholder="0" min="0" />
+              </div>
+              <div class="mini">
+                <label for="${prefix}-move-dmg-${i}">Dmg</label>
+                <input type="number" id="${prefix}-move-dmg-${i}" placeholder="0" min="0" />
+              </div>
+            </div>
+          </div>
+        `);
+      }
+      grid.innerHTML = cards.join('');
+    }
+
+    // PDF
+    function exportToPDF(panelId, filename){
+      const target = document.getElementById(panelId);
+      html2canvas(target, { scale: 2, backgroundColor: '#ffffff', useCORS: true }).then(canvas => {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = 210, pageHeight = 297;
+        const imgWidth = pageWidth;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        const imgData = canvas.toDataURL('image/png');
+
+        let heightLeft = imgHeight, position = 0;
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+
+        while (heightLeft > 0) {
+          position = heightLeft - imgHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+        }
+        pdf.save(filename || 'wrestler.pdf');
+      });
+    }
+
+    // Export single wrestler
+    function exportToJSON(prefix){
+      const data = getData(prefix);
+      const jsonString = JSON.stringify(data, null, 2);
+      const blob = new Blob([jsonString], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${prefix}-wrestler.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Export both wrestlers together
+    function exportBoth(){
+      const payload = { wrestlerA: getData('w1'), wrestlerB: getData('w2') };
+      const jsonString = JSON.stringify(payload, null, 2);
+      const blob = new Blob([jsonString], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `smacked-down-both.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Import single wrestler (expects the single-wrestler schema used by exportToJSON)
+    function importFromJSON(prefix){
+      const fileInput = document.getElementById(`${prefix}-file-input`);
+      const file = fileInput.files?.[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        try{
+          const data = JSON.parse(e.target.result);
+          setData(prefix, data);
+        }catch(err){
+          alert('Invalid JSON file');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // Helpers to read/write a wrestler
+    function getData(prefix){
+      return {
+        wrestler: {
+          name: val(`${prefix}-wrestler-name`),
+          archetype: val(`${prefix}-archetype`),
+          size: val(`${prefix}-size`),
+          movement: val(`${prefix}-movement`)
+        },
+        vitals: {
+          hp: { current: numVal(`${prefix}-hp-current`), total: numVal(`${prefix}-hp-total`) },
+          ap: { current: numVal(`${prefix}-ap-current`), total: numVal(`${prefix}-ap-total`) },
+          hmp: numVal(`${prefix}-hmp`)
+        },
+        stats: {
+          strength: { value: numVal(`${prefix}-stat-strength`), mod: numVal(`${prefix}-mod-strength`) },
+          toughness:{ value: numVal(`${prefix}-stat-toughness`), mod: numVal(`${prefix}-mod-toughness`) },
+          agility:  { value: numVal(`${prefix}-stat-agility`),   mod: numVal(`${prefix}-mod-agility`) },
+          ringIQ:   { value: numVal(`${prefix}-stat-ringiq`),    mod: numVal(`${prefix}-mod-ringiq`) },
+          promo:    { value: numVal(`${prefix}-stat-promo`),     mod: numVal(`${prefix}-mod-promo`) }
+        },
+        moves: getMoves(prefix)
+      };
+    }
+
+    function setData(prefix, data){
+      set(`${prefix}-wrestler-name`, data.wrestler?.name);
+      set(`${prefix}-archetype`, data.wrestler?.archetype);
+      set(`${prefix}-size`, data.wrestler?.size);
+      set(`${prefix}-movement`, data.wrestler?.movement);
+
+      set(`${prefix}-hp-current`, safeNum(data.vitals?.hp?.current));
+      set(`${prefix}-hp-total`,   safeNum(data.vitals?.hp?.total));
+      set(`${prefix}-ap-current`, safeNum(data.vitals?.ap?.current));
+      set(`${prefix}-ap-total`,   safeNum(data.vitals?.ap?.total));
+      set(`${prefix}-hmp`,        safeNum(data.vitals?.hmp));
+
+      set(`${prefix}-stat-strength`, safeNum(data.stats?.strength?.value));
+      set(`${prefix}-mod-strength`,  safeNum(data.stats?.strength?.mod));
+      set(`${prefix}-stat-toughness`, safeNum(data.stats?.toughness?.value));
+      set(`${prefix}-mod-toughness`,  safeNum(data.stats?.toughness?.mod));
+      set(`${prefix}-stat-agility`, safeNum(data.stats?.agility?.value));
+      set(`${prefix}-mod-agility`,  safeNum(data.stats?.agility?.mod));
+      set(`${prefix}-stat-ringiq`, safeNum(data.stats?.ringIQ?.value));
+      set(`${prefix}-mod-ringiq`,  safeNum(data.stats?.ringIQ?.mod));
+      set(`${prefix}-stat-promo`, safeNum(data.stats?.promo?.value));
+      set(`${prefix}-mod-promo`,  safeNum(data.stats?.promo?.mod));
+
+      for(let i=1;i<=MOVE_COUNT;i++){
+        const m = data.moves?.[i-1] || {};
+        set(`${prefix}-move-name-${i}`, m.name);
+        set(`${prefix}-move-desc-${i}`, m.description);
+        set(`${prefix}-move-ap-${i}`,   safeNum(m.ap_cost));
+        set(`${prefix}-move-dmg-${i}`,  safeNum(m.dmg));
+      }
+    }
+
+    function getMoves(prefix){
+      const arr = [];
+      for(let i=1;i<=MOVE_COUNT;i++){
+        arr.push({
+          name: val(`${prefix}-move-name-${i}`),
+          description: val(`${prefix}-move-desc-${i}`),
+          ap_cost: numVal(`${prefix}-move-ap-${i}`),
+          dmg: numVal(`${prefix}-move-dmg-${i}`)
+        });
+      }
+      return arr;
+    }
+
+    function val(id){ return document.getElementById(id)?.value ?? ''; }
+    function set(id, v){ const el = document.getElementById(id); if(el!=null){ el.value = v ?? ''; } }
+    function numVal(id){
+      const v = document.getElementById(id)?.value;
+      if(v === '' || v === null || v === undefined) return '';
+      const n = Number(v);
+      return Number.isFinite(n) ? n : '';
+    }
+    function safeNum(v){
+      if(v === '' || v === null || v === undefined) return '';
+      const n = Number(v);
+      return Number.isFinite(n) ? String(n) : '';
+    }
+  </script>
+</body>
+</html>
