@@ -20,6 +20,7 @@
       --shadow: 0 10px 30px rgba(0,0,0,.35);
     }
 
+    * , *::before, *::after{ box-sizing:border-box; }
     html,body{height:100%;}
     body{margin:0; background:linear-gradient(180deg, #0c100a, var(--bg)); font-family: ui-serif, Georgia, "Times New Roman", serif; color:var(--ink); line-height:1.25;}
 
@@ -51,8 +52,8 @@
 
     .attrs{display:grid; grid-template-columns:repeat(7, 1fr); gap:6px; margin-top:8px}
 
-    /* Responsive equipment grid using auto-fit */
-    .equip{display:grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap:8px; margin-top:8px}
+    /* Equipment: fixed 3 columns -> 2 -> 1, stable widths */
+    .equip{display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:10px; margin-top:8px}
 
     .btn{background:linear-gradient(180deg, #3e7b4f, #2f5b3a); color:#f6f3e7; border:1px solid #1e3a28; padding:8px 12px; border-radius:10px; cursor:pointer; box-shadow:0 2px 0 rgba(0,0,0,.15); font-weight:600; letter-spacing:.3px}
     .btn.secondary{background:linear-gradient(180deg, #b37d3c, #8a5f2e); border-color:#5b3c17}
@@ -82,11 +83,15 @@
 
     .footer-note{padding:10px 24px; color:#675b3d; font-size:12px}
 
-    @media (max-width: 760px){
+    @media (max-width: 960px){
       header{grid-template-columns:1fr}
       .member .top{grid-template-columns:1fr 1fr;}
       .attrs{grid-template-columns:repeat(3, 1fr)}
       .tracks{grid-template-columns:1fr}
+      .equip{grid-template-columns: repeat(2, minmax(0, 1fr));}
+    }
+    @media (max-width: 560px){
+      .equip{grid-template-columns: 1fr;}
     }
   </style>
 </head>
@@ -291,13 +296,15 @@
         ${dieAttr('Concealment','concealment',m.attrs.concealment)}
         ${dieAttr('Awareness','awareness',m.attrs.awareness)}
       </div>
-      <div class=\"equip\">
-        ${textField('Weapon 1','equip.weapon1',m.equip.weapon1)}
-        ${textField('Weapon 2','equip.weapon2',m.equip.weapon2)}
-        ${textField('Armour 1','equip.armour1',m.equip.armour1)}
-        ${textField('Armour 2','equip.armour2',m.equip.armour2)}
-        ${textField('Item','equip.item',m.equip.item)}
-        ${textField('Special','equip.special',m.equip.special)}
+      <div class="equip">
+        <!-- Row 1: Weapon 1 | Armour 1 | Item -->
+        <div class="band-field"><label>Weapon 1</label><input type="text" data-key="equip.weapon1" value=""/></div>
+        <div class="band-field"><label>Armour 1</label><input type="text" data-key="equip.armour1" value=""/></div>
+        <div class="band-field"><label>Item</label><input type="text" data-key="equip.item" value=""/></div>
+        <!-- Row 2: Weapon 2 | Armour 2 | Special -->
+        <div class="band-field"><label>Weapon 2</label><input type="text" data-key="equip.weapon2" value=""/></div>
+        <div class="band-field"><label>Armour 2</label><input type="text" data-key="equip.armour2" value=""/></div>
+        <div class="band-field"><label>Special</label><input type="text" data-key="equip.special" value=""/></div>
       </div>
       <div class=\"tracks\">
         <div class=\"track\" data-track=\"fate\"><h3>Fate</h3><div class=\"pips\">${pips(6, m.fate)}</div></div>
