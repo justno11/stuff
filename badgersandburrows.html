@@ -1,0 +1,283 @@
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // ---------- Safe element getter ----------
+  const $ = (id) => {
+    const el = document.getElementById(id);
+    if (!el) console.warn('[WARN] Missing element:', id);
+    return el;
+  };
+
+  // ---------- Tabs ----------
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  const tabContents = {
+    roster: $('tab-roster'),
+    campaign: $('tab-campaign')
+  };
+
+  function setTab(name){
+    tabButtons.forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+    Object.entries(tabContents).forEach(([k, el]) => {
+      if (el) el.classList.toggle('active', k === name);
+    });
+    try { localStorage.setItem('warband_tab', name); } catch(e){}
+  }
+
+  tabButtons.forEach(btn => btn?.addEventListener('click', () => setTab(btn.dataset.tab)));
+  (function restoreTab(){
+    try{
+      const saved = localStorage.getItem('warband_tab');
+      if(saved && tabContents[saved]) setTab(saved);
+    }catch(e){ /* no-op */ }
+  })();
+
+  // ---------- PDF export ----------
+  const exportPdfBtn = $('export-btn');
+  exportPdfBtn?.addEventListener('click', () => {
+    const target = $('warband-sheet');
+    if (!target) return alert('Page not ready.');
+    if (!window.html2canvas || !window.jspdf) {
+      alert('PDF libraries not loaded here.');
+      return;
+    }
+    html2canvas(target, { scale: 2, backgroundColor: null }).then(canvas => {
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p','mm','a4');
+      const imgData = canvas.toDataURL('image/png');
+      const imgWidth = 210;
+      const pageHeight = 297;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(imgData,'PNG',0,position,imgWidth,imgHeight);
+      heightLeft -= pageHeight;
+
+      while(heightLeft > 0){
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData,'PNG',0,position,imgWidth,imgHeight);
+        heightLeft -= pageHeight;
+      }
+      pdf.save('warband-sheet.pdf');
+    });
+  });
+
+  // ---------- JSON helpers ----------
+  function collectData(){
+    const ambitions = [];
+    for(let i=1;i<=6;i++){
+      ambitions.push({
+        check: !!$(`ambition-check${i}`)?.checked,
+        text:  $(`ambition-text${i}`)?.value || ''
+      });
+    }
+
+    const data = {
+      player: $('player')?.value || '',
+      warband: $('warband')?.value || '',
+      faction: $('faction')?.value || '',
+      leader: {
+        name: $('leader')?.value || '',
+        class: $('leader-class')?.value || '',
+        status: $('leader-status')?.value || '',
+        renown: $('leader-renown')?.value || '',
+        skill: $('leader-skill')?.value || '',
+        ability: $('leader-ability')?.value || '',
+        quality: $('leader-quality')?.value || '',
+        status_detail: $('leader-status-detail')?.value || '',
+        gear: $('leader-gear')?.value || '',
+        cost: $('leader-cost')?.value || ''
+      },
+      ambitions,
+      battles: { horror: [], conflict: [], event: [], renown: [], prestige: [] },
+      climax: { scenario_role: $('scenario-role')?.value || '' },
+      followers: [],
+      outcome: $('outcome')?.value || 'Victorious',
+      total: $('total')?.value || ''
+    };
+
+    for(let i=1; i<=19; i++){
+      data.battles.horror.push($(`horror${i}`)?.value || '');
+      data.battles.conflict.push($(`conflict${i}`)?.value || '');
+      data.battles.event.push($(`event${i}`)?.value || '');
+      data.battles.renown.push(!!$(`renown${i}`)?.checked);
+      data.battles.prestige.push(!!$(`prestige${i}`)?.checked);
+    }
+    data.battles.horror.push($('horrorClimax')?.value || '');
+    data.battles.conflict.push($('conflictClimax')?.value || '');
+    data.battles.event.push($('eventClimax')?.value || '');
+    data.battles.renown.push(!!$('renownClimax')?.checked);
+    data.battles.prestige.push(!!$('prestigeClimax')?.checked);
+
+    for(let i=1; i<=6; i++){
+      data.followers.push({
+        follower: $(`follower${i}-follower`)?.value || '',
+        class: $(`follower${i}-class`)?.value || '',
+        quality: $(`follower${i}-quality`)?.value || '',
+        status: $(`follower${i}-status`)?.value || '',
+        cost: $(`follower${i}-cost`)?.value || '',
+        skill: $(`follower${i}-skill`)?.value || '',
+        ability: $(`follower${i}-ability`)?.value || '',
+        gear: $(`follower${i}-gear`)?.value || ''
+      });
+    }
+    return data;
+  }
+
+  function populateFromData(data){
+    if (!data || typeof data !== 'object') return;
+
+    const setVal = (id, val) => { const el = $(id); if (el) el.value = val ?? ''; };
+    const setChk = (id, val) => { const el = $(id); if (el) el.checked = !!val; };
+
+    setVal('player', data.player);
+    setVal('warband', data.warband);
+    setVal('faction', data.faction);
+
+    setVal('leader', data.leader?.name);
+    setVal('leader-class', data.leader?.class);
+    setVal('leader-status', data.leader?.status);
+    setVal('leader-renown', data.leader?.renown);
+    setVal('leader-skill', data.leader?.skill);
+    setVal('leader-ability', data.leader?.ability);
+    setVal('leader-quality', data.leader?.quality);
+    setVal('leader-status-detail', data.leader?.status_detail);
+    setVal('leader-gear', data.leader?.gear);
+    setVal('leader-cost', data.leader?.cost);
+
+    for(let i=1;i<=6;i++){
+      const a = data.ambitions?.[i-1] || {};
+      setChk(`ambition-check${i}`, a.check);
+      setVal(`ambition-text${i}`, a.text || '');
+    }
+
+    for(let i=1;i<=19;i++){
+      setVal(`horror${i}`, data.battles?.horror?.[i-1] || '');
+      setVal(`conflict${i}`, data.battles?.conflict?.[i-1] || '');
+      setVal(`event${i}`, data.battles?.event?.[i-1] || '');
+      setChk(`renown${i}`, data.battles?.renown?.[i-1]);
+      setChk(`prestige${i}`, data.battles?.prestige?.[i-1]);
+    }
+    setVal('horrorClimax', data.battles?.horror?.[19] || '');
+    setVal('conflictClimax', data.battles?.conflict?.[19] || '');
+    setVal('eventClimax', data.battles?.event?.[19] || '');
+    setChk('renownClimax', data.battles?.renown?.[19]);
+    setChk('prestigeClimax', data.battles?.prestige?.[19]);
+    setVal('scenario-role', data.climax?.scenario_role || '');
+
+    for(let i=1;i<=6;i++){
+      const f = data.followers?.[i-1] || {};
+      setVal(`follower${i}-follower`, f.follower);
+      setVal(`follower${i}-class`, f.class);
+      setVal(`follower${i}-quality`, f.quality);
+      setVal(`follower${i}-status`, f.status);
+      setVal(`follower${i}-cost`, f.cost);
+      setVal(`follower${i}-skill`, f.skill);
+      setVal(`follower${i}-ability`, f.ability);
+      setVal(`follower${i}-gear`, f.gear);
+    }
+
+    setVal('outcome', data.outcome ?? 'Victorious');
+    setVal('total', data.total ?? '');
+
+    // If the data looks like campaign progress, auto-switch
+    if((data?.battles?.horror?.length || 0) > 0){ setTab('campaign'); }
+  }
+
+  // ---------- File JSON Export/Import ----------
+  $('export-json-btn')?.addEventListener('click', () => {
+    try{
+      const jsonString = JSON.stringify(collectData(), null, 2);
+      const blob = new Blob([jsonString], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'warband.json'; a.click();
+      URL.revokeObjectURL(url);
+    }catch(err){
+      console.error(err);
+      alert('Could not generate JSON.');
+    }
+  });
+
+  const importFileInput = $('import-file');
+  $('import-btn')?.addEventListener('click', () => {
+    const file = importFileInput?.files?.[0];
+    if(!file) return alert('Choose a JSON file first.');
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try{
+        const data = JSON.parse(e.target.result || '{}');
+        populateFromData(data);
+      }catch(err){
+        console.error(err);
+        alert('Could not parse JSON file. Check the content.');
+      }
+    };
+    reader.readAsText(file);
+  });
+
+  // ---------- Textarea JSON I/O (No file picker) ----------
+  const detailsBox = document.querySelector('details.json-io');
+  const jsonBox = $('json-io-text');
+
+  $('export-to-box-btn')?.addEventListener('click', () => {
+    try{
+      const jsonString = JSON.stringify(collectData(), null, 2);
+      if (jsonBox) jsonBox.value = jsonString;
+      if (detailsBox) detailsBox.open = true;
+    }catch(err){
+      console.error(err);
+      alert('Failed to create JSON.');
+    }
+  });
+
+  $('copy-box-btn')?.addEventListener('click', async () => {
+    try{
+      await navigator.clipboard.writeText(jsonBox?.value || '');
+      alert('JSON copied to clipboard');
+    }catch(e){
+      alert('Clipboard not available. Select and copy manually.');
+    }
+  });
+
+  $('import-from-box-btn')?.addEventListener('click', () => {
+    const text = (jsonBox?.value || '').trim();
+    if(!text){ alert('Paste JSON into the box first.'); return; }
+    try{
+      const data = JSON.parse(text);
+      populateFromData(data);
+      alert('Imported from box successfully.');
+    }catch(err){
+      console.error(err);
+      alert('Invalid JSON in the box. Please check your content.');
+    }
+  });
+
+  $('clear-box-btn')?.addEventListener('click', () => {
+    if (jsonBox) jsonBox.value = '';
+  });
+
+  // ---------- Optional: autosave to localStorage ----------
+  const AUTOSAVE_KEY = 'warband_autosave';
+  const doAutosave = () => {
+    try {
+      const jsonString = JSON.stringify(collectData());
+      localStorage.setItem(AUTOSAVE_KEY, jsonString);
+    } catch (e) {}
+  };
+  // Throttle autosave a bit
+  let autosaveTimer = null;
+  const scheduleAutosave = () => {
+    clearTimeout(autosaveTimer);
+    autosaveTimer = setTimeout(doAutosave, 500);
+  };
+  document.addEventListener('input', scheduleAutosave);
+  document.addEventListener('change', scheduleAutosave);
+
+  // Load autosave if present
+  try{
+    const saved = localStorage.getItem(AUTOSAVE_KEY);
+    if (saved) populateFromData(JSON.parse(saved));
+  }catch(e){}
+});
+</script>
