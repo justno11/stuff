@@ -1,283 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Woodland Warband Roster – B&B2e</title>
+  <style>
+    :root{
+      --bg:#0f120c;           /* deep forest */
+      --paper:#efe3b2;        /* warm parchment */
+      --paper-2:#e2d59a;      /* darker parchment */
+      --ink:#2b2415;          /* dark brown ink */
+      --leaf:#3c6e47;         /* woodland green */
+      --leaf-2:#2f5839;
+      --accent:#b1772a;       /* sap/amber */
+      --line:#cdbf83;         /* parchment line */
+      --muted:#756848;
+      --danger:#8b2f2f;
+      --ok:#2e6d4a;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+
+    /* Page */
+    html,body{height:100%;}
+    body{
+      margin:0; background:linear-gradient(180deg, #0c100a, var(--bg));
+      font-family: ui-serif, Georgia, "Times New Roman", serif; color:var(--ink);
+      line-height:1.25;
+    }
+
+    .wrap{
+      max-width:1100px; margin:24px auto; padding:20px;
+    }
+
+    .sheet{
+      background: radial-gradient(2000px 700px at 50% -10%, #fff2c9 0%, var(--paper) 40%, var(--paper-2) 100%);
+      border: 1px solid #dccb8f; border-radius:18px; box-shadow:var(--shadow);
+      position:relative; overflow:hidden;
+    }
+
+    /* Decorative border vines */
+    .sheet:before, .sheet:after{
+      content:""; position:absolute; inset:0; pointer-events:none;
+      background:
+        radial-gradient(20px 20px at 15% 8%, rgba(60,110,71,.35) 20%, transparent 42%),
+        radial-gradient(18px 18px at 10% 14%, rgba(60,110,71,.25) 18%, transparent 40%),
+        radial-gradient(16px 16px at 90% 10%, rgba(60,110,71,.30) 22%, transparent 45%),
+        conic-gradient(from 60deg at 10% 100%, rgba(47,88,57,.17), transparent 25%),
+        conic-gradient(from 120deg at 100% 0%, rgba(47,88,57,.17), transparent 25%);
+      mix-blend-mode:multiply; opacity:.85;
+    }
+
+    header{
+      display:grid; grid-template-columns:1.2fr .8fr .8fr; gap:12px; padding:24px 24px 12px;
+      border-bottom:2px dashed var(--line);
+    }
+
+    h1{
+      margin:0; font-size:28px; letter-spacing:.5px; color:#1f1a0e;
+    }
+    small.sub{display:block; color:var(--muted); margin-top:2px}
+
+    .band-field{display:flex; flex-direction:column; gap:6px}
+    label{font-variant:small-caps; letter-spacing:.08em; font-size:13px; color:#4a3e21}
+    input[type="text"], input[type="number"], textarea, select{
+      border:1px solid #cdbf83; background:linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.2));
+      padding:10px 12px; border-radius:9px; outline:none; color:#1f1a0e;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.4), inset 0 -2px 8px rgba(0,0,0,.06);
+    }
+    textarea{min-height:72px; resize:vertical}
+
+    .grid-3{display:grid; grid-template-columns:repeat(3, 1fr); gap:12px}
+    .grid-2{display:grid; grid-template-columns:repeat(2, 1fr); gap:12px}
+
+    .section{padding:16px 24px; border-bottom:1px dashed var(--line)}
+    .section h2{margin:0 0 8px; font-size:18px; color:#2e2616}
+    .section p.hint{margin:4px 0 12px; color:#6a5c3d; font-size:13px}
+
+    .pill{
+      display:inline-block; padding:6px 10px; border:1px solid #cdbf83; border-radius:999px;
+      background:linear-gradient(180deg, #fff8da, #ecdca3); color:#3b2f15; font-size:12px; margin-right:6px
+    }
+
+    .resources{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:10px}
+    .counter{display:flex; align-items:center; gap:8px}
+    .counter input{width:100%; text-align:center}
+
+    /* Members */
+    .members{padding:16px 24px}
+    .member{
+      background:linear-gradient(180deg, #fff7d2, #eddba2);
+      border:1px solid #d4c785; border-radius:14px; padding:12px; margin-bottom:12px;
+      position:relative; overflow:hidden;
+    }
+    .member .row{display:grid; grid-template-columns: repeat(6, minmax(0,1fr)); gap:10px}
+    .member .row.tight{grid-template-columns: repeat(8, minmax(0,1fr));}
+    .member .top{display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr; gap:10px; margin-bottom:8px}
+
+    .attrs{display:grid; grid-template-columns:repeat(7, 1fr); gap:6px; margin-top:8px}
+    .attrs .attr{display:flex; flex-direction:column}
+
+    .equip{display:grid; grid-template-columns: repeat(6, 1fr); gap:8px; margin-top:8px}
+
+    .flex{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+
+    .btn{
+      background:linear-gradient(180deg, #3e7b4f, #2f5b3a); color:#f6f3e7; border:1px solid #1e3a28;
+      padding:8px 12px; border-radius:10px; cursor:pointer; box-shadow:0 2px 0 rgba(0,0,0,.15);
+      font-weight:600; letter-spacing:.3px
+    }
+    .btn.secondary{background:linear-gradient(180deg, #b37d3c, #8a5f2e); border-color:#5b3c17}
+    .btn.ghost{background:transparent; color:#3a603f; border:1px dashed #3a603f}
+    .btn.danger{background:linear-gradient(180deg, #8b3a3a, #6f2d2d); border-color:#4a1d1d}
+
+    .toolbar{display:flex; gap:8px; flex-wrap:wrap; padding:12px 24px; border-top:1px dashed var(--line); background:linear-gradient(180deg, rgba(255,255,255,.15), rgba(255,255,255,.05))}
+
+    details.jsonbox{margin:16px 24px; background:linear-gradient(180deg, #fff7d2, #eedd9c); border:1px solid #d6c788; border-radius:12px}
+    details.jsonbox > summary{cursor:pointer; padding:14px 16px; list-style:none; font-weight:700}
+    details.jsonbox[open] > summary{border-bottom:1px dashed var(--line)}
+    .json-area{padding:12px}
+    .json-area textarea{width:100%; min-height:160px}
+
+    .mini{
+      display:flex; align-items:center; gap:8px; font-size:12px; color:#5a4f35;
+    }
+
+    .chip-group{display:flex; gap:6px; flex-wrap:wrap}
+    .chip{
+      display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px; background:linear-gradient(180deg,#fff3c1,#ead68d);
+      border:1px solid #cfbf82; font-size:12px
+    }
+
+    .fateexp{display:grid; grid-template-columns:repeat(2, 1fr); gap:8px; margin-top:6px}
+    .track{display:flex; align-items:center; gap:6px; flex-wrap:wrap}
+    .dot{width:18px; height:18px; border-radius:50%; border:1px solid #a28f58; background:#fff6cc; cursor:pointer}
+    .dot.on{background:var(--leaf); border-color:#24412b}
+
+    .right{margin-left:auto}
+
+    .footer-note{padding:10px 24px; color:#675b3d; font-size:12px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="sheet" id="app">
+      <header>
+        <div>
+          <h1>Woodland Warband Roster</h1>
+          <small class="sub">Burrows & Badgers 2e – campaign play aid</small>
+        </div>
+        <div class="band-field">
+          <label for="bandName">Band Name</label>
+          <input id="bandName" type="text" placeholder="e.g., Thorn & Thistle Company"/>
+        </div>
+        <div class="band-field">
+          <label for="rating">Rating</label>
+          <input id="rating" type="number" min="0" step="1" value="0"/>
+        </div>
+      </header>
+
+      <div class="section">
+        <div class="grid-3">
+          <div class="band-field">
+            <label for="allegiance">Allegiance</label>
+            <input id="allegiance" type="text" placeholder="Freebeasts, Wildbeasts, etc."/>
+          </div>
+          <div class="band-field">
+            <label for="archetype">Archetype</label>
+            <input id="archetype" type="text" placeholder="e.g., Rogues, Cultists"/>
+          </div>
+          <div class="band-field">
+            <label for="notes">Notes</label>
+            <input id="notes" type="text" placeholder="Campaign notes, reminders, injuries..."/>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Stores & Den</h2>
+        <p class="hint">Track what you’ve stashed and how you’ve improved your den between games.</p>
+        <div class="grid-2">
+          <div class="band-field">
+            <label>Stashed Equipment</label>
+            <textarea id="stashed" placeholder="Comma‑separated list or free text"></textarea>
+          </div>
+          <div class="band-field">
+            <label>Den Upgrades</label>
+            <textarea id="upgrades" placeholder="Kennel, Forge, Shrine, etc."></textarea>
+          </div>
+        </div>
+        <div class="section" style="border:none; padding:0; margin-top:12px">
+          <div class="resources">
+            <div class="band-field">
+              <label for="treasury">Treasury</label>
+              <input id="treasury" type="number" min="0" step="1" value="0"/>
+            </div>
+            <div class="band-field">
+              <label for="labour">Labour</label>
+              <input id="labour" type="number" min="0" step="1" value="0"/>
+            </div>
+            <div class="band-field">
+              <label for="materials">Materials</label>
+              <input id="materials" type="number" min="0" step="1" value="0"/>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Pensioners</h2>
+        <p class="hint">Retired heroes of renown.</p>
+        <div id="pension" class="chip-group"></div>
+        <div class="flex" style="margin-top:8px">
+          <input id="pensionInput" type="text" placeholder="Add a name and press +"/>
+          <button class="btn secondary" id="pensionAdd">+ Add</button>
+        </div>
+      </div>
+
+      <div class="members" id="members">
+        <!-- Member cards injected here -->
+      </div>
+
+      <div class="toolbar">
+        <button class="btn" id="addMember">+ Add Member</button>
+        <button class="btn secondary" id="exportBtn">Export JSON</button>
+        <button class="btn ghost" id="downloadBtn">Download .json</button>
+        <button class="btn" id="importFromBox">Import from box</button>
+        <button class="btn danger right" id="clearAll">Clear All</button>
+      </div>
+
+      <details class="jsonbox" id="jsonBox">
+        <summary>JSON import/export (click to expand)</summary>
+        <div class="json-area">
+          <div class="mini">Paste JSON below and click <strong>Import from box</strong> • or click <strong>Export JSON</strong> to print your current state.</div>
+          <textarea id="jsonArea" placeholder="{ \"band\": { ... }, \"members\": [ ... ] }"></textarea>
+        </div>
+      </details>
+
+      <div class="footer-note">Autosaves locally in your browser. Use Export/Download to back up or move between devices.</div>
+    </div>
+  </div>
+
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  // ---------- Safe element getter ----------
-  const $ = (id) => {
-    const el = document.getElementById(id);
-    if (!el) console.warn('[WARN] Missing element:', id);
-    return el;
+(function(){
+  const $ = s => document.querySelector(s);
+  const $$ = s => Array.from(document.querySelectorAll(s));
+
+  const state = {
+    band:{
+      name:"",
+      rating:0,
+      allegiance:"",
+      notes:"",
+      archetype:"",
+      stashed:"",
+      upgrades:"",
+      treasury:0, labour:0, materials:0,
+      pension:[]
+    },
+    members:[]
   };
 
-  // ---------- Tabs ----------
-  const tabButtons = document.querySelectorAll('.tab-btn');
-  const tabContents = {
-    roster: $('tab-roster'),
-    campaign: $('tab-campaign')
+  // UI refs
+  const refs = {
+    bandName: $('#bandName'), rating: $('#rating'), allegiance: $('#allegiance'), notes: $('#notes'),
+    archetype: $('#archetype'), stashed: $('#stashed'), upgrades: $('#upgrades'),
+    treasury: $('#treasury'), labour: $('#labour'), materials: $('#materials'),
+    pensionWrap: $('#pension'), pensionInput: $('#pensionInput'), pensionAdd: $('#pensionAdd'),
+    members: $('#members'), addMember: $('#addMember'),
+    exportBtn: $('#exportBtn'), downloadBtn: $('#downloadBtn'), jsonArea: $('#jsonArea'),
+    jsonBox: $('#jsonBox'), importFromBox: $('#importFromBox'), clearAll: $('#clearAll')
   };
 
-  function setTab(name){
-    tabButtons.forEach(b => b.classList.toggle('active', b.dataset.tab === name));
-    Object.entries(tabContents).forEach(([k, el]) => {
-      if (el) el.classList.toggle('active', k === name);
-    });
-    try { localStorage.setItem('warband_tab', name); } catch(e){}
-  }
+  const STORAGE_KEY = 'bb2e_woodland_roster_v1';
 
-  tabButtons.forEach(btn => btn?.addEventListener('click', () => setTab(btn.dataset.tab)));
-  (function restoreTab(){
-    try{
-      const saved = localStorage.getItem('warband_tab');
-      if(saved && tabContents[saved]) setTab(saved);
-    }catch(e){ /* no-op */ }
-  })();
-
-  // ---------- PDF export ----------
-  const exportPdfBtn = $('export-btn');
-  exportPdfBtn?.addEventListener('click', () => {
-    const target = $('warband-sheet');
-    if (!target) return alert('Page not ready.');
-    if (!window.html2canvas || !window.jspdf) {
-      alert('PDF libraries not loaded here.');
-      return;
-    }
-    html2canvas(target, { scale: 2, backgroundColor: null }).then(canvas => {
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF('p','mm','a4');
-      const imgData = canvas.toDataURL('image/png');
-      const imgWidth = 210;
-      const pageHeight = 297;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      pdf.addImage(imgData,'PNG',0,position,imgWidth,imgHeight);
-      heightLeft -= pageHeight;
-
-      while(heightLeft > 0){
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData,'PNG',0,position,imgWidth,imgHeight);
-        heightLeft -= pageHeight;
-      }
-      pdf.save('warband-sheet.pdf');
-    });
-  });
-
-  // ---------- JSON helpers ----------
-  function collectData(){
-    const ambitions = [];
-    for(let i=1;i<=6;i++){
-      ambitions.push({
-        check: !!$(`ambition-check${i}`)?.checked,
-        text:  $(`ambition-text${i}`)?.value || ''
-      });
-    }
-
-    const data = {
-      player: $('player')?.value || '',
-      warband: $('warband')?.value || '',
-      faction: $('faction')?.value || '',
-      leader: {
-        name: $('leader')?.value || '',
-        class: $('leader-class')?.value || '',
-        status: $('leader-status')?.value || '',
-        renown: $('leader-renown')?.value || '',
-        skill: $('leader-skill')?.value || '',
-        ability: $('leader-ability')?.value || '',
-        quality: $('leader-quality')?.value || '',
-        status_detail: $('leader-status-detail')?.value || '',
-        gear: $('leader-gear')?.value || '',
-        cost: $('leader-cost')?.value || ''
-      },
-      ambitions,
-      battles: { horror: [], conflict: [], event: [], renown: [], prestige: [] },
-      climax: { scenario_role: $('scenario-role')?.value || '' },
-      followers: [],
-      outcome: $('outcome')?.value || 'Victorious',
-      total: $('total')?.value || ''
+  // Member factory
+  function blankMember(){
+    return {
+      id: crypto.randomUUID(),
+      name:"", species:"", level:0, presence:0, fortitude:0,
+      skills:"",
+      attrs:{ move:0, strike:0, block:0, ranged:0, nimbleness:0, concealment:0, awareness:0 },
+      equip:{ weapon1:"", weapon2:"", armour1:"", armour2:"", item:"", special:"" },
+      fate:0, // 0-6
+      exp:0   // 0-12
     };
+  }
 
-    for(let i=1; i<=19; i++){
-      data.battles.horror.push($(`horror${i}`)?.value || '');
-      data.battles.conflict.push($(`conflict${i}`)?.value || '');
-      data.battles.event.push($(`event${i}`)?.value || '');
-      data.battles.renown.push(!!$(`renown${i}`)?.checked);
-      data.battles.prestige.push(!!$(`prestige${i}`)?.checked);
-    }
-    data.battles.horror.push($('horrorClimax')?.value || '');
-    data.battles.conflict.push($('conflictClimax')?.value || '');
-    data.battles.event.push($('eventClimax')?.value || '');
-    data.battles.renown.push(!!$('renownClimax')?.checked);
-    data.battles.prestige.push(!!$('prestigeClimax')?.checked);
+  function save(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+  function load(){
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return;
+    try{
+      const data = JSON.parse(raw);
+      if(data?.band) Object.assign(state.band, data.band);
+      if(Array.isArray(data?.members)) state.members = data.members;
+    }catch(e){ console.warn('Failed to load saved state', e); }
+  }
 
-    for(let i=1; i<=6; i++){
-      data.followers.push({
-        follower: $(`follower${i}-follower`)?.value || '',
-        class: $(`follower${i}-class`)?.value || '',
-        quality: $(`follower${i}-quality`)?.value || '',
-        status: $(`follower${i}-status`)?.value || '',
-        cost: $(`follower${i}-cost`)?.value || '',
-        skill: $(`follower${i}-skill`)?.value || '',
-        ability: $(`follower${i}-ability`)?.value || '',
-        gear: $(`follower${i}-gear`)?.value || ''
+  function bindBand(){
+    const b = state.band;
+    refs.bandName.value = b.name||"";
+    refs.rating.value = b.rating||0;
+    refs.allegiance.value = b.allegiance||"";
+    refs.notes.value = b.notes||"";
+    refs.archetype.value = b.archetype||"";
+    refs.stashed.value = b.stashed||"";
+    refs.upgrades.value = b.upgrades||"";
+    refs.treasury.value = b.treasury||0;
+    refs.labour.value = b.labour||0;
+    refs.materials.value = b.materials||0;
+    renderPension();
+  }
+
+  function onBandInput(){
+    state.band.name = refs.bandName.value;
+    state.band.rating = num(refs.rating.value);
+    state.band.allegiance = refs.allegiance.value;
+    state.band.notes = refs.notes.value;
+    state.band.archetype = refs.archetype.value;
+    state.band.stashed = refs.stashed.value;
+    state.band.upgrades = refs.upgrades.value;
+    state.band.treasury = num(refs.treasury.value);
+    state.band.labour = num(refs.labour.value);
+    state.band.materials = num(refs.materials.value);
+    save();
+  }
+
+  function renderPension(){
+    refs.pensionWrap.innerHTML = '';
+    state.band.pension.forEach((name, idx)=>{
+      const chip = document.createElement('span');
+      chip.className = 'chip';
+      chip.innerHTML = `<span>🕯️ ${escapeHtml(name)}</span> <button class="btn ghost" style="padding:2px 6px" data-i="${idx}">×</button>`;
+      chip.querySelector('button').addEventListener('click',()=>{
+        state.band.pension.splice(idx,1);renderPension();save();
       });
-    }
-    return data;
+      refs.pensionWrap.appendChild(chip);
+    });
   }
 
-  function populateFromData(data){
-    if (!data || typeof data !== 'object') return;
-
-    const setVal = (id, val) => { const el = $(id); if (el) el.value = val ?? ''; };
-    const setChk = (id, val) => { const el = $(id); if (el) el.checked = !!val; };
-
-    setVal('player', data.player);
-    setVal('warband', data.warband);
-    setVal('faction', data.faction);
-
-    setVal('leader', data.leader?.name);
-    setVal('leader-class', data.leader?.class);
-    setVal('leader-status', data.leader?.status);
-    setVal('leader-renown', data.leader?.renown);
-    setVal('leader-skill', data.leader?.skill);
-    setVal('leader-ability', data.leader?.ability);
-    setVal('leader-quality', data.leader?.quality);
-    setVal('leader-status-detail', data.leader?.status_detail);
-    setVal('leader-gear', data.leader?.gear);
-    setVal('leader-cost', data.leader?.cost);
-
-    for(let i=1;i<=6;i++){
-      const a = data.ambitions?.[i-1] || {};
-      setChk(`ambition-check${i}`, a.check);
-      setVal(`ambition-text${i}`, a.text || '');
-    }
-
-    for(let i=1;i<=19;i++){
-      setVal(`horror${i}`, data.battles?.horror?.[i-1] || '');
-      setVal(`conflict${i}`, data.battles?.conflict?.[i-1] || '');
-      setVal(`event${i}`, data.battles?.event?.[i-1] || '');
-      setChk(`renown${i}`, data.battles?.renown?.[i-1]);
-      setChk(`prestige${i}`, data.battles?.prestige?.[i-1]);
-    }
-    setVal('horrorClimax', data.battles?.horror?.[19] || '');
-    setVal('conflictClimax', data.battles?.conflict?.[19] || '');
-    setVal('eventClimax', data.battles?.event?.[19] || '');
-    setChk('renownClimax', data.battles?.renown?.[19]);
-    setChk('prestigeClimax', data.battles?.prestige?.[19]);
-    setVal('scenario-role', data.climax?.scenario_role || '');
-
-    for(let i=1;i<=6;i++){
-      const f = data.followers?.[i-1] || {};
-      setVal(`follower${i}-follower`, f.follower);
-      setVal(`follower${i}-class`, f.class);
-      setVal(`follower${i}-quality`, f.quality);
-      setVal(`follower${i}-status`, f.status);
-      setVal(`follower${i}-cost`, f.cost);
-      setVal(`follower${i}-skill`, f.skill);
-      setVal(`follower${i}-ability`, f.ability);
-      setVal(`follower${i}-gear`, f.gear);
-    }
-
-    setVal('outcome', data.outcome ?? 'Victorious');
-    setVal('total', data.total ?? '');
-
-    // If the data looks like campaign progress, auto-switch
-    if((data?.battles?.horror?.length || 0) > 0){ setTab('campaign'); }
+  function addPension(){
+    const v = refs.pensionInput.value.trim();
+    if(!v) return;
+    state.band.pension.push(v); refs.pensionInput.value='';
+    renderPension(); save();
   }
 
-  // ---------- File JSON Export/Import ----------
-  $('export-json-btn')?.addEventListener('click', () => {
-    try{
-      const jsonString = JSON.stringify(collectData(), null, 2);
-      const blob = new Blob([jsonString], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = 'warband.json'; a.click();
-      URL.revokeObjectURL(url);
-    }catch(err){
-      console.error(err);
-      alert('Could not generate JSON.');
+  function renderMembers(){
+    refs.members.innerHTML = '';
+    state.members.forEach((m, idx)=>{
+      const el = document.createElement('div');
+      el.className = 'member';
+      el.dataset.id = m.id;
+      el.innerHTML = memberTemplate(m, idx);
+      // wire inputs
+      wireMember(el, m);
+      refs.members.appendChild(el);
+    });
+  }
+
+  function memberTemplate(m, idx){
+    return `
+      <div class="flex" style="justify-content:space-between; margin-bottom:6px">
+        <div class="mini">Member ${idx+1}</div>
+        <div class="flex">
+          <button class="btn ghost" data-act="dup">Duplicate</button>
+          <button class="btn danger" data-act="del">Remove</button>
+        </div>
+      </div>
+      <div class="top">
+        ${field('Name','name',m.name)}
+        ${field('Species','species',m.species)}
+        ${number('Level','level',m.level)}
+        ${number('Presence','presence',m.presence)}
+        ${number('Fortitude','fortitude',m.fortitude)}
+      </div>
+      <div class="band-field">
+        <label>Skills / Spells / Special</label>
+        <textarea data-key="skills" placeholder="Keywords, abilities, spell names, animal traits, etc.">${escapeHtml(m.skills||'')}</textarea>
+      </div>
+      <div class="attrs">
+        ${numAttr('Move','move',m.attrs.move)}
+        ${numAttr('Strike','strike',m.attrs.strike)}
+        ${numAttr('Block','block',m.attrs.block)}
+        ${numAttr('Ranged','ranged',m.attrs.ranged)}
+        ${numAttr('Nimbleness','nimbleness',m.attrs.nimbleness)}
+        ${numAttr('Concealment','concealment',m.attrs.concealment)}
+        ${numAttr('Awareness','awareness',m.attrs.awareness)}
+      </div>
+      <div class="equip">
+        ${field('Weapon 1','weapon1',m.equip.weapon1, 'equip')}
+        ${field('Weapon 2','weapon2',m.equip.weapon2, 'equip')}
+        ${field('Armour 1','armour1',m.equip.armour1, 'equip')}
+        ${field('Armour 2','armour2',m.equip.armour2, 'equip')}
+        ${field('Item','item',m.equip.item, 'equip')}
+        ${field('Special','special',m.equip.special, 'equip')}
+      </div>
+      <div class="fateexp">
+        <div class="track" data-track="fate">
+          <label style="font-variant:small-caps; width:60px">Fate</label>
+          ${dots(6, m.fate)}
+        </div>
+        <div class="track" data-track="exp">
+          <label style="font-variant:small-caps; width:60px">EXP</label>
+          ${dots(12, m.exp)}
+        </div>
+      </div>
+    `;
+  }
+
+  function field(labelTxt, key, val, scope){
+    const dk = scope? `${scope}.${key}` : key;
+    return `<div class="band-field"><label>${labelTxt}</label><input type="text" data-key="${dk}" value="${escapeHtml(val||'')}"/></div>`;
+  }
+  function number(labelTxt, key, val){
+    return `<div class="band-field"><label>${labelTxt}</label><input type="number" step="1" data-key="${key}" value="${val||0}"/></div>`;
+  }
+  function numAttr(labelTxt, key, val){
+    return `<div class="attr"><label>${labelTxt}</label><input type="number" step="1" data-key="attrs.${key}" value="${val||0}"/></div>`;
+  }
+  function dots(n, active){
+    let out = '';
+    for(let i=1;i<=n;i++){
+      const on = i<=active? 'on':'';
+      out += `<div class="dot ${on}" data-i="${i}"></div>`;
     }
-  });
+    return out;
+  }
 
-  const importFileInput = $('import-file');
-  $('import-btn')?.addEventListener('click', () => {
-    const file = importFileInput?.files?.[0];
-    if(!file) return alert('Choose a JSON file first.');
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try{
-        const data = JSON.parse(e.target.result || '{}');
-        populateFromData(data);
-      }catch(err){
-        console.error(err);
-        alert('Could not parse JSON file. Check the content.');
-      }
-    };
-    reader.readAsText(file);
-  });
+  function wireMember(el, m){
+    el.querySelectorAll('input[data-key], textarea[data-key]').forEach(inp=>{
+      inp.addEventListener('input', ()=>{
+        setDeep(m, inp.dataset.key, inp.type==='number'? num(inp.value) : inp.value);
+        save();
+      });
+    });
+    el.querySelectorAll('.track').forEach(tr=>{
+      const type = tr.dataset.track;
+      tr.querySelectorAll('.dot').forEach(dot=>{
+        dot.addEventListener('click',()=>{
+          const i = num(dot.dataset.i);
+          m[type] = (m[type]===i)? i-1 : i; // toggle-like behavior
+          renderMembers();
+          save();
+        });
+      });
+    });
+    el.querySelector('[data-act="del"]').addEventListener('click',()=>{
+      state.members = state.members.filter(mm=>mm.id!==m.id);
+      renderMembers(); save();
+    });
+    el.querySelector('[data-act="dup"]').addEventListener('click',()=>{
+      const copy = JSON.parse(JSON.stringify(m));
+      copy.id = crypto.randomUUID();
+      state.members.splice(state.members.indexOf(m)+1,0,copy);
+      renderMembers(); save();
+    });
+  }
 
-  // ---------- Textarea JSON I/O (No file picker) ----------
-  const detailsBox = document.querySelector('details.json-io');
-  const jsonBox = $('json-io-text');
-
-  $('export-to-box-btn')?.addEventListener('click', () => {
-    try{
-      const jsonString = JSON.stringify(collectData(), null, 2);
-      if (jsonBox) jsonBox.value = jsonString;
-      if (detailsBox) detailsBox.open = true;
-    }catch(err){
-      console.error(err);
-      alert('Failed to create JSON.');
+  // Utilities
+  function setDeep(obj, path, value){
+    const parts = path.split('.');
+    let cur = obj;
+    for(let i=0;i<parts.length-1;i++){
+      const k = parts[i];
+      if(!(k in cur)) cur[k] = {};
+      cur = cur[k];
     }
-  });
+    cur[parts[parts.length-1]] = value;
+  }
+  function num(v){ return (v===''||v===null||v===undefined)? 0 : Number(v); }
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, s=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[s]));
+  }
 
-  $('copy-box-btn')?.addEventListener('click', async () => {
+  function addMember(){ state.members.push(blankMember()); renderMembers(); save(); }
+
+  // JSON IO
+  function exportJSON(){
+    const data = JSON.stringify(state, null, 2);
+    refs.jsonArea.value = data; refs.jsonBox.open = true;
+  }
+  function downloadJSON(){
+    const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const name = (state.band.name||'warband').replace(/[^a-z0-9]+/gi,'_').replace(/^_|_$/g,'');
+    a.href = url; a.download = `${name||'warband'}.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  }
+  function importFromTextarea(){
+    const raw = refs.jsonArea.value.trim();
+    if(!raw) return alert('Paste JSON into the box first.');
     try{
-      await navigator.clipboard.writeText(jsonBox?.value || '');
-      alert('JSON copied to clipboard');
-    }catch(e){
-      alert('Clipboard not available. Select and copy manually.');
-    }
+      const data = JSON.parse(raw);
+      if(!data || typeof data !== 'object') throw new Error('Bad JSON');
+      // replace state shallowly to keep refs
+      Object.assign(state.band, data.band||{});
+      state.members = Array.isArray(data.members)? data.members : [];
+      bindBand(); renderMembers(); save();
+      alert('Imported successfully.');
+    }catch(e){ alert('Invalid JSON. Check your paste and try again.'); }
+  }
+
+  function clearAll(){
+    if(!confirm('Clear all data from this sheet? This cannot be undone.')) return;
+    state.band = { name:"", rating:0, allegiance:"", notes:"", archetype:"", stashed:"", upgrades:"", treasury:0, labour:0, materials:0, pension:[] };
+    state.members = [];
+    bindBand(); renderMembers(); save();
+  }
+
+  // Wire band inputs
+  [refs.bandName, refs.rating, refs.allegiance, refs.notes, refs.archetype, refs.stashed, refs.upgrades, refs.treasury, refs.labour, refs.materials].forEach(el=>{
+    el.addEventListener('input', onBandInput);
   });
+  refs.pensionAdd.addEventListener('click', addPension);
+  refs.pensionInput.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); addPension(); } });
 
-  $('import-from-box-btn')?.addEventListener('click', () => {
-    const text = (jsonBox?.value || '').trim();
-    if(!text){ alert('Paste JSON into the box first.'); return; }
-    try{
-      const data = JSON.parse(text);
-      populateFromData(data);
-      alert('Imported from box successfully.');
-    }catch(err){
-      console.error(err);
-      alert('Invalid JSON in the box. Please check your content.');
-    }
-  });
+  refs.addMember.addEventListener('click', addMember);
+  refs.exportBtn.addEventListener('click', exportJSON);
+  refs.downloadBtn.addEventListener('click', downloadJSON);
+  refs.importFromBox.addEventListener('click', importFromTextarea);
+  refs.clearAll.addEventListener('click', clearAll);
 
-  $('clear-box-btn')?.addEventListener('click', () => {
-    if (jsonBox) jsonBox.value = '';
-  });
+  // Init
+  load(); bindBand(); renderMembers();
 
-  // ---------- Optional: autosave to localStorage ----------
-  const AUTOSAVE_KEY = 'warband_autosave';
-  const doAutosave = () => {
-    try {
-      const jsonString = JSON.stringify(collectData());
-      localStorage.setItem(AUTOSAVE_KEY, jsonString);
-    } catch (e) {}
-  };
-  // Throttle autosave a bit
-  let autosaveTimer = null;
-  const scheduleAutosave = () => {
-    clearTimeout(autosaveTimer);
-    autosaveTimer = setTimeout(doAutosave, 500);
-  };
-  document.addEventListener('input', scheduleAutosave);
-  document.addEventListener('change', scheduleAutosave);
-
-  // Load autosave if present
-  try{
-    const saved = localStorage.getItem(AUTOSAVE_KEY);
-    if (saved) populateFromData(JSON.parse(saved));
-  }catch(e){}
-});
+  // First-time helper: seed one member if empty
+  if(state.members.length===0){ addMember(); }
+})();
 </script>
+</body>
+</html>
