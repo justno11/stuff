@@ -1,395 +1,828 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Woodland Warband Roster – B&B2e</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Doomed Warband Sheet</title>
   <style>
     :root{
-      --bg:#0f120c;           /* deep forest */
-      --paper:#efe3b2;        /* warm parchment */
-      --paper-2:#e2d59a;      /* darker parchment */
-      --ink:#2b2415;          /* dark brown ink */
-      --leaf:#3c6e47;         /* woodland green */
-      --leaf-2:#2f5839;
-      --accent:#b1772a;       /* sap/amber */
-      --line:#cdbf83;         /* parchment line */
-      --muted:#756848;
-      --danger:#8b2f2f;
-      --ok:#2e6d4a;
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --bg: #0b0b0d;
+      --panel: #121214;
+      --panel-2: #16161a;
+      --text: #e6e6e6;
+      --muted: #b6b6b6;
+      --line: #2a2a30;
+      --accent: #e11d48;
+      --accent-2:#7f1d1d;
+      --accent-3:#9f1239;
+      --focus: #f43f5e;
+      --ok: #16a34a;
+      --warn: #f59e0b;
     }
 
-    * , *::before, *::after{ box-sizing:border-box; }
-    html,body{height:100%;}
-    body{margin:0; background:linear-gradient(180deg, #0c100a, var(--bg)); font-family: ui-serif, Georgia, "Times New Roman", serif; color:var(--ink); line-height:1.25;}
+    *{ box-sizing: border-box; }
 
-    .wrap{max-width:1100px; margin:24px auto; padding:20px}
-    .sheet{background: radial-gradient(2000px 700px at 50% -10%, #fff2c9 0%, var(--paper) 40%, var(--paper-2) 100%); border: 1px solid #dccb8f; border-radius:18px; box-shadow:var(--shadow); position:relative; overflow:hidden}
-    .sheet:before,.sheet:after{content:""; position:absolute; inset:0; pointer-events:none; background:radial-gradient(20px 20px at 15% 8%, rgba(60,110,71,.35) 20%, transparent 42%), radial-gradient(18px 18px at 10% 14%, rgba(60,110,71,.25) 18%, transparent 40%), radial-gradient(16px 16px at 90% 10%, rgba(60,110,71,.30) 22%, transparent 45%), conic-gradient(from 60deg at 10% 100%, rgba(47,88,57,.17), transparent 25%), conic-gradient(from 120deg at 100% 0%, rgba(47,88,57,.17), transparent 25%); mix-blend-mode:multiply; opacity:.85}
-
-    header{display:grid; grid-template-columns:1.2fr .8fr .8fr; gap:12px; padding:24px 24px 12px; border-bottom:2px dashed var(--line)}
-    h1{margin:0; font-size:28px; letter-spacing:.5px; color:#1f1a0e}
-    small.sub{display:block; color:var(--muted); margin-top:2px}
-
-    .band-field{display:flex; flex-direction:column; gap:6px}
-    label{font-variant:small-caps; letter-spacing:.08em; font-size:13px; color:#4a3e21}
-    input[type="text"], input[type="number"], textarea, select{border:1px solid #cdbf83; background:linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.2)); padding:10px 12px; border-radius:9px; outline:none; color:#1f1a0e; box-shadow: inset 0 1px 0 rgba(255,255,255,.4), inset 0 -2px 8px rgba(0,0,0,.06); width:100%;}
-    select{cursor:pointer}
-    textarea{min-height:88px; resize:vertical}
-    textarea.auto{min-height:88px; resize:none}
-
-    .grid-3{display:grid; grid-template-columns:repeat(3, 1fr); gap:12px}
-    .grid-2{display:grid; grid-template-columns:repeat(2, 1fr); gap:12px}
-
-    .section{padding:16px 24px; border-bottom:1px dashed var(--line)}
-    .section h2{margin:0 0 8px; font-size:18px; color:#2e2616}
-    .section p.hint{margin:4px 0 12px; color:#6a5c3d; font-size:13px}
-
-    .members{padding:16px 24px}
-    .member{background:linear-gradient(180deg, #fff7d2, #eddba2); border:1px solid #d4c785; border-radius:14px; padding:12px; margin-bottom:12px; position:relative}
-    .member .top{display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr; gap:10px; margin-bottom:8px}
-
-    .attrs{display:grid; grid-template-columns:repeat(7, 1fr); gap:6px; margin-top:8px}
-
-    /* Equipment: fixed 3 columns -> 2 -> 1, stable widths */
-    .equip{display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:10px; margin-top:8px}
-
-    .btn{background:linear-gradient(180deg, #3e7b4f, #2f5b3a); color:#f6f3e7; border:1px solid #1e3a28; padding:8px 12px; border-radius:10px; cursor:pointer; box-shadow:0 2px 0 rgba(0,0,0,.15); font-weight:600; letter-spacing:.3px}
-    .btn.secondary{background:linear-gradient(180deg, #b37d3c, #8a5f2e); border-color:#5b3c17}
-    .btn.ghost{background:transparent; color:#3a603f; border:1px dashed #3a603f}
-    .btn.danger{background:linear-gradient(180deg, #8b3a3a, #6f2d2d); border-color:#4a1d1d}
-
-    .toolbar{display:flex; gap:8px; flex-wrap:wrap; padding:12px 24px; border-top:1px dashed var(--line); background:linear-gradient(180deg, rgba(255,255,255,.15), rgba(255,255,255,.05))}
-
-    details.jsonbox{margin:16px 24px; background:linear-gradient(180deg, #fff7d2, #eedd9c); border:1px solid #d6c788; border-radius:12px}
-    details.jsonbox > summary{cursor:pointer; padding:14px 16px; list-style:none; font-weight:700}
-    details.jsonbox[open] > summary{border-bottom:1px dashed var(--line)}
-    .json-area{padding:12px}
-    .json-area textarea{width:100%; min-height:160px}
-
-    .mini{display:flex; align-items:center; gap:8px; font-size:12px; color:#5a4f35}
-
-    .chip-group{display:flex; gap:6px; flex-wrap:wrap}
-    .chip{display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px; background:linear-gradient(180deg,#fff3c1,#ead68d); border:1px solid #cfbf82; font-size:12px}
-
-    .tracks{display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-top:8px}
-    .track{background:linear-gradient(180deg,#fff3c1,#ead68d); border:1px solid #cfbf82; border-radius:10px; padding:8px}
-    .track h3{margin:0 0 6px; font-size:13px; font-variant:small-caps; letter-spacing:.08em}
-    .pips{display:flex; flex-wrap:wrap; gap:6px}
-    .dot{width:18px; height:18px; border-radius:50%; border:1px solid #a28f58; background:#fff6cc; cursor:pointer}
-    .dot.on{background:var(--leaf); border-color:#24412b}
-    .wound-controls{display:flex; gap:6px; align-items:center; margin-top:6px}
-
-    .footer-note{padding:10px 24px; color:#675b3d; font-size:12px}
-
-    @media (max-width: 960px){
-      header{grid-template-columns:1fr}
-      .member .top{grid-template-columns:1fr 1fr;}
-      .attrs{grid-template-columns:repeat(3, 1fr)}
-      .tracks{grid-template-columns:1fr}
-      .equip{grid-template-columns: repeat(2, minmax(0, 1fr));}
+    body{
+      font-family: system-ui, Arial, sans-serif;
+      background: radial-gradient(1200px 800px at 20% -10%, rgba(225,29,72,.12), transparent 60%),
+                  radial-gradient(900px 600px at 110% 0%, rgba(225,29,72,.08), transparent 60%),
+                  var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 24px;
     }
-    @media (max-width: 560px){
-      .equip{grid-template-columns: 1fr;}
+
+    #warband-sheet{
+      max-width: 1100px;
+      margin: 0 auto;
+      background: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.03);
+      overflow: hidden;
+    }
+
+    .shell{ padding: 20px; }
+
+    h1{
+      font-size: 22px;
+      margin: 0;
+      padding: 16px 20px;
+      letter-spacing: .5px;
+      background: linear-gradient(90deg, rgba(225,29,72,.15), transparent 60%);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .header{
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      margin: 16px 0 8px 0;
+    }
+    .header.header-2{
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin-top: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    .field label{
+      display:block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 4px;
+      letter-spacing: .2px;
+    }
+
+    input[type="text"], input[type="number"], textarea, select{
+      width: 100%;
+      color: var(--text);
+      background: #0f0f12;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    input[type="text"]::placeholder, input[type="number"]::placeholder, textarea::placeholder{ color:#8a8a8a; }
+    input[type="text"]:focus, input[type="number"]:focus, textarea:focus, select:focus{
+      border-color: var(--focus);
+      box-shadow: 0 0 0 3px rgba(244,63,94,.15);
+    }
+
+    .section-title{
+      font-weight: 700;
+      margin: 12px 0 10px;
+      font-size: 14px;
+      letter-spacing: .4px;
+      color: #ffd7dd;
+      text-transform: uppercase;
+    }
+
+    .leader-details, .follower-details, .climax{
+      background: #101014;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .leader-grid, .follower-grid{
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr)); /* +1 column to fit Fee */
+      gap: 10px;
+    }
+
+    .stack{ margin-top: 10px; }
+
+    /* Tabs */
+    .tabs{ margin-top: 14px; border-top: 1px solid var(--line); }
+    .tab-nav{
+      display:flex;
+      gap: 6px;
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
+      background: #0f0f13;
+    }
+    .tab-btn{
+      appearance: none;
+      border: 1px solid var(--line);
+      background: #141418;
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-weight: 600;
+      letter-spacing: .2px;
+      cursor: pointer;
+      transition: transform .05s ease, background .2s, border-color .2s, color .2s;
+    }
+    .tab-btn:hover{ border-color: var(--accent-3); }
+    .tab-btn.active{
+      background: linear-gradient(180deg, rgba(225,29,72,.25), rgba(225,29,72,.18));
+      border-color: var(--accent-3);
+      color: #ffeef2;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 6px 14px rgba(225,29,72,.15);
+    }
+    .tab-content{ display:none; padding: 14px; }
+    .tab-content.active{ display:block; }
+
+    /* Ambitions */
+    .ambitions{ display: grid; gap: 8px; }
+    .ambitions .amb-row{
+      display: grid;
+      grid-template-columns: 24px 1fr;
+      gap: 10px;
+      align-items: center;
+      background: #0f0f13;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px;
+    }
+    input[type="checkbox"]{
+      width: 18px; height: 18px;
+      accent-color: var(--accent);
+    }
+
+    /* Battles tables */
+    .battles-table{
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 12px;
+      overflow: hidden;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: #0f0f13;
+    }
+    .battles-table th{
+      background: linear-gradient(180deg, rgba(225,29,72,.18), rgba(225,29,72,.08));
+      color:#ffd7dd;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing:.4px;
+      padding: 8px;
+      border-bottom: 1px solid var(--line);
+    }
+    .battles-table td{
+      border-top: 1px solid #1f1f25;
+      padding: 6px;
+      text-align: center;
+      color: var(--text);
+    }
+    .battles-table td:first-child{
+      text-align: left;
+      font-weight: 600;
+      color: #ffcad3;
+      background: #141419;
+    }
+    .battles-table input[type="text"]{
+      width: 46px;
+      text-align: center;
+      padding: 6px 6px;
+    }
+    .battles-table input[type="checkbox"]{ transform: scale(1.2); }
+
+    .outcome{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      align-items: center;
+      background: #101014;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      margin-top: 10px;
+    }
+    .outcome .field{ min-width: 220px; }
+
+    /* Buttons */
+    .actions{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      padding: 16px;
+      border-top: 1px solid var(--line);
+      background: #0f0f13;
+    }
+    .btn{
+      border: 1px solid var(--accent-3);
+      background: linear-gradient(180deg, rgba(225,29,72,.25), rgba(225,29,72,.15));
+      color: #ffeef2;
+      padding: 10px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 700;
+      letter-spacing: .3px;
+      transition: transform .05s ease, filter .15s ease, box-shadow .15s ease;
+    }
+    .btn:hover{ filter: brightness(1.05); box-shadow: 0 10px 20px rgba(225,29,72,.20); }
+    .btn:active{ transform: translateY(1px); }
+
+    .full-width-label{ display:block; margin: 8px 0 6px; color: var(--muted); font-size: 12px; }
+    .full-width-input{ width: 100%; }
+
+    /* Collapsible JSON panel */
+    details.json-io{
+      border-top: 1px solid var(--line);
+      background: #0f0f13;
+    }
+    details.json-io > summary{
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+      padding: 14px 20px;
+      font-weight: 700;
+      color: #ffd7dd;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    details.json-io > summary::before{
+      content: "▶";
+      font-size: 12px;
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+    details.json-io[open] > summary::before{ content: "▼"; }
+    .json-io-body{
+      padding: 0 20px 20px;
+      display: grid;
+      gap: 10px;
+    }
+    #json-io-text{
+      min-height: 260px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      line-height: 1.35;
+      resize: vertical;
+      background: #0c0c10;
+    }
+    .json-io-actions{
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+
+    @media (min-width: 1200px){
+      .shell{ padding: 24px 24px 8px; }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="sheet" id="app">
-      <header>
-        <div>
-          <h1>Woodland Warband Roster</h1>
-          <small class="sub">Burrows & Badgers 2e – campaign play aid</small>
-        </div>
-        <div class="band-field"><label for="bandName">Band Name</label><input id="bandName" type="text" placeholder="e.g., Thorn & Thistle Company"/></div>
-        <div class="band-field"><label for="rating">Rating</label><input id="rating" type="number" min="0" step="1" value="0"/></div>
-      </header>
-
-      <div class="section">
-        <div class="grid-3">
-          <div class="band-field"><label for="allegiance">Allegiance</label><input id="allegiance" type="text" placeholder="Freebeasts, Wildbeasts, etc."/></div>
-          <div class="band-field"><label for="archetype">Archetype</label><input id="archetype" type="text" placeholder="e.g., Rogues, Cultists"/></div>
-          <div class="band-field"><label for="notes">Notes</label><input id="notes" type="text" placeholder="Campaign notes, reminders, injuries..."/></div>
-        </div>
+  <div id="warband-sheet">
+    <h1>The Doomed Warband Sheet</h1>
+    <div class="shell">
+      <!-- Top meta -->
+      <div class="header">
+        <div class="field"><label>Player</label><input type="text" id="player" placeholder="Player name"></div>
+        <div class="field"><label>Leader</label><input type="text" id="leader" placeholder="Leader name"></div>
+        <div class="field"><label>Class</label><input type="text" id="leader-class" placeholder="Leader class"></div>
+        <div class="field"><label>Status</label><input type="text" id="leader-status" placeholder="Leader status"></div>
+        <div class="field"><label>Renown</label><input type="text" id="leader-renown" placeholder="Leader renown"></div>
+      </div>
+      <div class="header header-2">
+        <div class="field"><label>Warband</label><input type="text" id="warband" placeholder="Warband name"></div>
+        <div class="field"><label>Faction</label><input type="text" id="faction" placeholder="Faction"></div>
       </div>
 
-      <div class="section">
-        <h2>Stores & Den</h2>
-        <p class="hint">Track what you’ve stashed and how you’ve improved your den between games.</p>
-        <div class="grid-2">
-          <div class="band-field"><label>Stashed Equipment</label><textarea id="stashed" placeholder="Comma‑separated list or free text"></textarea></div>
-          <div class="band-field"><label>Den Upgrades</label><textarea id="upgrades" placeholder="Kennel, Forge, Shrine, etc."></textarea></div>
+      <!-- Tabs -->
+      <div class="tabs">
+        <div class="tab-nav">
+          <button class="tab-btn active" data-tab="roster">Roster</button>
+          <button class="tab-btn" data-tab="campaign">Campaign</button>
         </div>
-        <div class="section" style="border:none; padding:0; margin-top:12px">
-          <div class="resources">
-            <div class="band-field"><label for="treasury">Treasury</label><input id="treasury" type="number" min="0" step="1" value="0"/></div>
-            <div class="band-field"><label for="labour">Labour</label><input id="labour" type="number" min="0" step="1" value="0"/></div>
-            <div class="band-field"><label for="materials">Materials</label><input id="materials" type="number" min="0" step="1" value="0"/></div>
+
+        <!-- TAB 1: Roster -->
+        <div class="tab-content active" id="tab-roster">
+          <div class="section-title">Leader</div>
+          <div class="leader-details">
+            <div class="leader-grid">
+              <div class="field"><label>Quality</label><input type="text" id="leader-quality"></div>
+              <div class="field"><label>Status (Detail)</label><input type="text" id="leader-status-detail"></div>
+              <div class="field"><label>Cost</label><input type="text" id="leader-cost"></div>
+              <div class="field"><label>Fee</label><input type="number" id="leader-fee" min="0" step="1" placeholder="0"></div>
+              <div class="field"><label>Skill</label><input type="text" id="leader-skill" placeholder="Leader skill"></div>
+              <div class="field"><label>Ability</label><input type="text" id="leader-ability" placeholder="Leader ability"></div>
+            </div>
+            <div class="stack">
+              <label for="leader-gear" class="full-width-label">Gear</label>
+              <textarea id="leader-gear" rows="2" class="full-width-input" placeholder="Leader gear"></textarea>
+            </div>
+          </div>
+
+          <div class="section-title">Followers</div>
+
+          <!-- Followers 1..6 -->
+          <div class="follower-details">
+            <div class="follower-grid">
+              <div class="field"><label>Follower</label><input type="text" id="follower1-follower"></div>
+              <div class="field"><label>Class</label><input type="text" id="follower1-class"></div>
+              <div class="field"><label>Quality</label><input type="text" id="follower1-quality"></div>
+              <div class="field"><label>Status</label><input type="text" id="follower1-status"></div>
+              <div class="field"><label>Cost</label><input type="text" id="follower1-cost"></div>
+              <div class="field"><label>Fee</label><input type="number" id="follower1-fee" min="0" step="1" placeholder="0"></div>
+            </div>
+            <div class="stack">
+              <label for="follower1-skill" class="full-width-label">Skill</label>
+              <input type="text" id="follower1-skill" class="full-width-input">
+              <label for="follower1-ability" class="full-width-label">Ability</label>
+              <textarea id="follower1-ability" rows="2" class="full-width-input" placeholder="Ability"></textarea>
+              <label for="follower1-gear" class="full-width-label">Gear</label>
+              <textarea id="follower1-gear" rows="2" class="full-width-input"></textarea>
+            </div>
+          </div>
+
+          <div class="follower-details">
+            <div class="follower-grid">
+              <div class="field"><label>Follower</label><input type="text" id="follower2-follower"></div>
+              <div class="field"><label>Class</label><input type="text" id="follower2-class"></div>
+              <div class="field"><label>Quality</label><input type="text" id="follower2-quality"></div>
+              <div class="field"><label>Status</label><input type="text" id="follower2-status"></div>
+              <div class="field"><label>Cost</label><input type="text" id="follower2-cost"></div>
+              <div class="field"><label>Fee</label><input type="number" id="follower2-fee" min="0" step="1" placeholder="0"></div>
+            </div>
+            <div class="stack">
+              <label for="follower2-skill" class="full-width-label">Skill</label>
+              <input type="text" id="follower2-skill" class="full-width-input">
+              <label for="follower2-ability" class="full-width-label">Ability</label>
+              <textarea id="follower2-ability" rows="2" class="full-width-input" placeholder="Ability"></textarea>
+              <label for="follower2-gear" class="full-width-label">Gear</label>
+              <textarea id="follower2-gear" rows="2" class="full-width-input"></textarea>
+            </div>
+          </div>
+
+          <div class="follower-details">
+            <div class="follower-grid">
+              <div class="field"><label>Follower</label><input type="text" id="follower3-follower"></div>
+              <div class="field"><label>Class</label><input type="text" id="follower3-class"></div>
+              <div class="field"><label>Quality</label><input type="text" id="follower3-quality"></div>
+              <div class="field"><label>Status</label><input type="text" id="follower3-status"></div>
+              <div class="field"><label>Cost</label><input type="text" id="follower3-cost"></div>
+              <div class="field"><label>Fee</label><input type="number" id="follower3-fee" min="0" step="1" placeholder="0"></div>
+            </div>
+            <div class="stack">
+              <label for="follower3-skill" class="full-width-label">Skill</label>
+              <input type="text" id="follower3-skill" class="full-width-input">
+              <label for="follower3-ability" class="full-width-label">Ability</label>
+              <textarea id="follower3-ability" rows="2" class="full-width-input" placeholder="Ability"></textarea>
+              <label for="follower3-gear" class="full-width-label">Gear</label>
+              <textarea id="follower3-gear" rows="2" class="full-width-input"></textarea>
+            </div>
+          </div>
+
+          <div class="follower-details">
+            <div class="follower-grid">
+              <div class="field"><label>Follower</label><input type="text" id="follower4-follower"></div>
+              <div class="field"><label>Class</label><input type="text" id="follower4-class"></div>
+              <div class="field"><label>Quality</label><input type="text" id="follower4-quality"></div>
+              <div class="field"><label>Status</label><input type="text" id="follower4-status"></div>
+              <div class="field"><label>Cost</label><input type="text" id="follower4-cost"></div>
+              <div class="field"><label>Fee</label><input type="number" id="follower4-fee" min="0" step="1" placeholder="0"></div>
+            </div>
+            <div class="stack">
+              <label for="follower4-skill" class="full-width-label">Skill</label>
+              <input type="text" id="follower4-skill" class="full-width-input">
+              <label for="follower4-ability" class="full-width-label">Ability</label>
+              <textarea id="follower4-ability" rows="2" class="full-width-input" placeholder="Ability"></textarea>
+              <label for="follower4-gear" class="full-width-label">Gear</label>
+              <textarea id="follower4-gear" rows="2" class="full-width-input"></textarea>
+            </div>
+          </div>
+
+          <div class="follower-details">
+            <div class="follower-grid">
+              <div class="field"><label>Follower</label><input type="text" id="follower5-follower"></div>
+              <div class="field"><label>Class</label><input type="text" id="follower5-class"></div>
+              <div class="field"><label>Quality</label><input type="text" id="follower5-quality"></div>
+              <div class="field"><label>Status</label><input type="text" id="follower5-status"></div>
+              <div class="field"><label>Cost</label><input type="text" id="follower5-cost"></div>
+              <div class="field"><label>Fee</label><input type="number" id="follower5-fee" min="0" step="1" placeholder="0"></div>
+            </div>
+            <div class="stack">
+              <label for="follower5-skill" class="full-width-label">Skill</label>
+              <input type="text" id="follower5-skill" class="full-width-input">
+              <label for="follower5-ability" class="full-width-label">Ability</label>
+              <textarea id="follower5-ability" rows="2" class="full-width-input" placeholder="Ability"></textarea>
+              <label for="follower5-gear" class="full-width-label">Gear</label>
+              <textarea id="follower5-gear" rows="2" class="full-width-input"></textarea>
+            </div>
+          </div>
+
+          <div class="follower-details">
+            <div class="follower-grid">
+              <div class="field"><label>Follower</label><input type="text" id="follower6-follower"></div>
+              <div class="field"><label>Class</label><input type="text" id="follower6-class"></div>
+              <div class="field"><label>Quality</label><input type="text" id="follower6-quality"></div>
+              <div class="field"><label>Status</label><input type="text" id="follower6-status"></div>
+              <div class="field"><label>Cost</label><input type="text" id="follower6-cost"></div>
+              <div class="field"><label>Fee</label><input type="number" id="follower6-fee" min="0" step="1" placeholder="0"></div>
+            </div>
+            <div class="stack">
+              <label for="follower6-skill" class="full-width-label">Skill</label>
+              <input type="text" id="follower6-skill" class="full-width-input">
+              <label for="follower6-ability" class="full-width-label">Ability</label>
+              <textarea id="follower6-ability" rows="2" class="full-width-input" placeholder="Ability"></textarea>
+              <label for="follower6-gear" class="full-width-label">Gear</label>
+              <textarea id="follower6-gear" rows="2" class="full-width-input"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: Campaign -->
+        <div class="tab-content" id="tab-campaign">
+          <div class="section-title">Leader Ambitions</div>
+          <div class="ambitions">
+            <div class="amb-row">
+              <input type="checkbox" id="ambition-check1">
+              <input type="text" id="ambition-text1" placeholder="Ambition 1">
+            </div>
+            <div class="amb-row">
+              <input type="checkbox" id="ambition-check2">
+              <input type="text" id="ambition-text2" placeholder="Ambition 2">
+            </div>
+            <div class="amb-row">
+              <input type="checkbox" id="ambition-check3">
+              <input type="text" id="ambition-text3" placeholder="Ambition 3">
+            </div>
+            <div class="amb-row">
+              <input type="checkbox" id="ambition-check4">
+              <input type="text" id="ambition-text4" placeholder="Ambition 4">
+            </div>
+            <div class="amb-row">
+              <input type="checkbox" id="ambition-check5">
+              <input type="text" id="ambition-text5" placeholder="Ambition 5">
+            </div>
+            <div class="amb-row">
+              <input type="checkbox" id="ambition-check6">
+              <input type="text" id="ambition-text6" placeholder="Ambition 6">
+            </div>
+          </div>
+
+          <div class="section-title">Battles</div>
+          <table class="battles-table">
+            <thead>
+              <tr>
+                <th>Battle</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Horror</td><td><input type="text" id="horror1"></td><td><input type="text" id="horror2"></td><td><input type="text" id="horror3"></td><td><input type="text" id="horror4"></td><td><input type="text" id="horror5"></td><td><input type="text" id="horror6"></td><td><input type="text" id="horror7"></td><td><input type="text" id="horror8"></td><td><input type="text" id="horror9"></td><td><input type="text" id="horror10"></td></tr>
+              <tr><td>Conflict</td><td><input type="text" id="conflict1"></td><td><input type="text" id="conflict2"></td><td><input type="text" id="conflict3"></td><td><input type="text" id="conflict4"></td><td><input type="text" id="conflict5"></td><td><input type="text" id="conflict6"></td><td><input type="text" id="conflict7"></td><td><input type="text" id="conflict8"></td><td><input type="text" id="conflict9"></td><td><input type="text" id="conflict10"></td></tr>
+              <tr><td>Event</td><td><input type="text" id="event1"></td><td><input type="text" id="event2"></td><td><input type="text" id="event3"></td><td><input type="text" id="event4"></td><td><input type="text" id="event5"></td><td><input type="text" id="event6"></td><td><input type="text" id="event7"></td><td><input type="text" id="event8"></td><td><input type="text" id="event9"></td><td><input type="text" id="event10"></td></tr>
+              <tr><td>Renown</td><td><input type="checkbox" id="renown1"></td><td><input type="checkbox" id="renown2"></td><td><input type="checkbox" id="renown3"></td><td><input type="checkbox" id="renown4"></td><td><input type="checkbox" id="renown5"></td><td><input type="checkbox" id="renown6"></td><td><input type="checkbox" id="renown7"></td><td><input type="checkbox" id="renown8"></td><td><input type="checkbox" id="renown9"></td><td><input type="checkbox" id="renown10"></td></tr>
+              <tr><td>Prestige</td><td><input type="checkbox" id="prestige1"></td><td><input type="checkbox" id="prestige2"></td><td><input type="checkbox" id="prestige3"></td><td><input type="checkbox" id="prestige4"></td><td><input type="checkbox" id="prestige5"></td><td><input type="checkbox" id="prestige6"></td><td><input type="checkbox" id="prestige7"></td><td><input type="checkbox" id="prestige8"></td><td><input type="checkbox" id="prestige9"></td><td><input type="checkbox" id="prestige10"></td></tr>
+            </tbody>
+          </table>
+
+          <table class="battles-table">
+            <thead>
+              <tr>
+                <th>Battle</th><th>11</th><th>12</th><th>13</th><th>14</th><th>15</th><th>16</th><th>17</th><th>18</th><th>19</th><th>Climax</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Horror</td><td><input type="text" id="horror11"></td><td><input type="text" id="horror12"></td><td><input type="text" id="horror13"></td><td><input type="text" id="horror14"></td><td><input type="text" id="horror15"></td><td><input type="text" id="horror16"></td><td><input type="text" id="horror17"></td><td><input type="text" id="horror18"></td><td><input type="text" id="horror19"></td><td><input type="text" id="horrorClimax"></td></tr>
+              <tr><td>Conflict</td><td><input type="text" id="conflict11"></td><td><input type="text" id="conflict12"></td><td><input type="text" id="conflict13"></td><td><input type="text" id="conflict14"></td><td><input type="text" id="conflict15"></td><td><input type="text" id="conflict16"></td><td><input type="text" id="conflict17"></td><td><input type="text" id="conflict18"></td><td><input type="text" id="conflict19"></td><td><input type="text" id="conflictClimax"></td></tr>
+              <tr><td>Event</td><td><input type="text" id="event11"></td><td><input type="text" id="event12"></td><td><input type="text" id="event13"></td><td><input type="text" id="event14"></td><td><input type="text" id="event15"></td><td><input type="text" id="event16"></td><td><input type="text" id="event17"></td><td><input type="text" id="event18"></td><td><input type="text" id="event19"></td><td><input type="text" id="eventClimax"></td></tr>
+              <tr><td>Renown</td><td><input type="checkbox" id="renown11"></td><td><input type="checkbox" id="renown12"></td><td><input type="checkbox" id="renown13"></td><td><input type="checkbox" id="renown14"></td><td><input type="checkbox" id="renown15"></td><td><input type="checkbox" id="renown16"></td><td><input type="checkbox" id="renown17"></td><td><input type="checkbox" id="renown18"></td><td><input type="checkbox" id="renown19"></td><td><input type="checkbox" id="renownClimax"></td></tr>
+              <tr><td>Prestige</td><td><input type="checkbox" id="prestige11"></td><td><input type="checkbox" id="prestige12"></td><td><input type="checkbox" id="prestige13"></td><td><input type="checkbox" id="prestige14"></td><td><input type="checkbox" id="prestige15"></td><td><input type="checkbox" id="prestige16"></td><td><input type="checkbox" id="prestige17"></td><td><input type="checkbox" id="prestige18"></td><td><input type="checkbox" id="prestige19"></td><td><input type="checkbox" id="prestigeClimax"></td></tr>
+            </tbody>
+          </table>
+
+          <div class="section-title">Climax</div>
+          <div class="climax">
+            <p style="color:#ffb4c1; margin:0 0 8px;">
+              At 10 Prestige, initiate the Climax (p. 158). If another Warband reaches 10 Prestige at the same time, roll off to determine who chooses. Each Warband takes the Climax's Role entry for the number of Leader Ambitions achieved (or a lower entry if they wish). The winner of the Climax wins the Campaign. If winning the Climax becomes impossible, the Doomed have won.
+            </p>
+            <label for="scenario-role" class="full-width-label">Scenario Role</label>
+            <input type="text" id="scenario-role" class="full-width-input" placeholder="Role chosen for the Climax">
+          </div>
+
+          <div class="outcome">
+            <div class="field">
+              <label>In the End, We Were</label>
+              <select id="outcome">
+                <option>Victorious</option>
+                <option>Defeated</option>
+                <option>Doomed</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Total</label>
+              <input type="text" id="total" placeholder="Score / Tally">
+            </div>
           </div>
         </div>
       </div>
-
-      <div class="section">
-        <h2>Pensioners</h2>
-        <p class="hint">Retired heroes of renown.</p>
-        <div id="pension" class="chip-group"></div>
-        <div class="mini" style="gap:8px; margin-top:8px"><input id="pensionInput" type="text" placeholder="Add a name and press +"/><button class="btn secondary" id="pensionAdd">+ Add</button></div>
-      </div>
-
-      <div class="members" id="members"></div>
-
-      <div class="toolbar">
-        <button class="btn" id="addMember">+ Add Member</button>
-        <button class="btn secondary" id="exportBtn">Export JSON</button>
-        <button class="btn ghost" id="downloadBtn">Download .json</button>
-        <button class="btn" id="importFromBox">Import from box</button>
-        <button class="btn danger" id="clearAll">Clear All</button>
-      </div>
-
-      <details class="jsonbox" id="jsonBox">
-        <summary>JSON import/export (click to expand)</summary>
-        <div class="json-area">
-          <div class="mini">Paste JSON below and click <strong>Import from box</strong> • or click <strong>Export JSON</strong> to print your current state.</div>
-          <textarea id="jsonArea" placeholder="{ \"band\": { ... }, \"members\": [ ... ] }"></textarea>
-        </div>
-      </details>
-
-      <div class="footer-note">Autosaves locally in your browser. Use Export/Download to back up or move between devices.</div>
     </div>
+
+    <!-- Actions footer -->
+    <div class="actions">
+      <button id="export-btn" class="btn">Export to PDF</button>
+      <button id="export-json-btn" class="btn">Export to JSON</button>
+      <label class="btn" style="position:relative; overflow:hidden;">
+        <input type="file" id="import-file" accept=".json" style="position:absolute; inset:0; opacity:0; cursor:pointer;">
+        Choose JSON…
+      </label>
+      <button id="import-btn" class="btn">Import from JSON</button>
+    </div>
+
+    <!-- Collapsible JSON Text I/O (no file picker required) -->
+    <details class="json-io">
+      <summary>JSON Import/Export (No file picker)</summary>
+      <div class="json-io-body">
+        <textarea id="json-io-text" placeholder='Paste JSON here to import, or click "Export to Box" to dump current data...'></textarea>
+        <div class="json-io-actions">
+          <button id="export-to-box-btn" class="btn">Export to Box</button>
+          <button id="copy-box-btn" class="btn">Copy to Clipboard</button>
+          <button id="import-from-box-btn" class="btn">Import from Box</button>
+          <button id="clear-box-btn" class="btn">Clear Box</button>
+        </div>
+      </div>
+    </details>
   </div>
 
-<script>
-(function(){
-  const $ = s => document.querySelector(s);
-  const $$ = s => Array.from(document.querySelectorAll(s));
+  <!-- libs -->
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-  const DICE = ["d2","d4","d6","d8","d10","d12","d20"];
-  function normalizeDie(v){
-    if(typeof v === 'string' && /^d(2|4|6|8|10|12|20)$/i.test(v)) return v.toLowerCase();
-    const n = Number(v)||6; const allowed=[2,4,6,8,10,12,20];
-    let best=6, diff=1e9; for(const a of allowed){ const d=Math.abs(a-n); if(d<diff){diff=d; best=a;} }
-    return `d${best}`;
-  }
-
-  const state = {
-    band:{ name:"", rating:0, allegiance:"", notes:"", archetype:"", stashed:"", upgrades:"", treasury:0, labour:0, materials:0, pension:[] },
-    members:[]
-  };
-
-  const refs = {
-    bandName: $('#bandName'), rating: $('#rating'), allegiance: $('#allegiance'), notes: $('#notes'), archetype: $('#archetype'),
-    stashed: $('#stashed'), upgrades: $('#upgrades'), treasury: $('#treasury'), labour: $('#labour'), materials: $('#materials'),
-    pensionWrap: $('#pension'), pensionInput: $('#pensionInput'), pensionAdd: $('#pensionAdd'),
-    members: $('#members'), addMember: $('#addMember'), exportBtn: $('#exportBtn'), downloadBtn: $('#downloadBtn'), jsonArea: $('#jsonArea'), jsonBox: $('#jsonBox'), importFromBox: $('#importFromBox'), clearAll: $('#clearAll')
-  };
-
-  const STORAGE_KEY = 'bb2e_woodland_roster_v4';
-
-  function blankMember(){
-    return {
-      id: crypto.randomUUID(),
-      name:"", species:"",
-      level:1, // numeric per rules
-      presence:"d6", fortitude:"d6", // dice selectors
-      skills:"", spells:"",
-      attrs:{ move:"d6", strike:"d6", block:"d6", ranged:"d6", nimbleness:"d6", concealment:"d6", awareness:"d6" },
-      equip:{ weapon1:"", weapon2:"", armour1:"", armour2:"", item:"", special:"" },
-      fate:0, exp:0,
-      wounds:{ current:0, max:6 }
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const $ = (id) => {
+      const el = document.getElementById(id);
+      if (!el) console.warn('[WARN] Missing element:', id);
+      return el;
     };
-  }
 
-  function save(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
-  function load(){
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw){ try{ Object.assign(state, JSON.parse(raw)||{}); }catch(e){} return; }
-    const old = localStorage.getItem('bb2e_woodland_roster_v3') || localStorage.getItem('bb2e_woodland_roster_v2') || localStorage.getItem('bb2e_woodland_roster_v1');
-    if(!old) return;
-    try{
-      const data = JSON.parse(old);
-      if(data?.band) state.band = data.band;
-      if(Array.isArray(data?.members)) state.members = data.members.map(upgradeMember);
-    }catch(e){ console.warn('migrate fail', e); }
-  }
-
-  function upgradeMember(m){
-    const base = blankMember();
-    const merged = Object.assign(base, m);
-    // Level must be numeric
-    if(typeof merged.level === 'string'){
-      if(/^d(2|4|6|8|10|12|20)$/i.test(merged.level)) merged.level = 1; else merged.level = Number(merged.level)||1;
-    }else{
-      merged.level = Number(merged.level)||1;
+    // Tabs
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabContents = { roster: $('tab-roster'), campaign: $('tab-campaign') };
+    function setTab(name){
+      tabButtons.forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+      Object.entries(tabContents).forEach(([k, el]) => { if (el) el.classList.toggle('active', k === name); });
+      try { localStorage.setItem('warband_tab', name); } catch(e){}
     }
-    // Normalize P/F dice
-    merged.presence = normalizeDie(merged.presence);
-    merged.fortitude = normalizeDie(merged.fortitude);
-    // Core attrs
-    merged.attrs = convertAttrsToDice(merged.attrs);
-    if(!merged.spells) merged.spells = "";
-    if(merged.wounds && typeof merged.wounds === 'object'){
-      merged.wounds = { current: clamp(Number(merged.wounds.current)||0, 0, Number(merged.wounds.max)||6), max: Number(merged.wounds.max)||6 };
-    }
-    return merged;
-  }
+    tabButtons.forEach(btn => btn?.addEventListener('click', () => setTab(btn.dataset.tab)));
+    (function restoreTab(){ try{ const saved = localStorage.getItem('warband_tab'); if(saved && tabContents[saved]) setTab(saved);}catch(e){} })();
 
-  function convertAttrsToDice(attrs){
-    const out = { move:"d6", strike:"d6", block:"d6", ranged:"d6", nimbleness:"d6", concealment:"d6", awareness:"d6" };
-    if(!attrs) return out;
-    for(const k of Object.keys(out)){
-      const v = attrs[k];
-      out[k] = (typeof v === 'string' && /^d(2|4|6|8|10|12|20)$/i.test(v)) ? v.toLowerCase() : `d${Math.max(2, Math.min(20, Number(v)||6))}`;
-    }
-    return out;
-  }
-
-  function bindBand(){
-    const b = state.band;
-    $('#bandName').value = b.name||"";
-    $('#rating').value = b.rating||0;
-    $('#allegiance').value = b.allegiance||"";
-    $('#notes').value = b.notes||"";
-    $('#archetype').value = b.archetype||"";
-    $('#stashed').value = b.stashed||"";
-    $('#upgrades').value = b.upgrades||"";
-    $('#treasury').value = b.treasury||0;
-    $('#labour').value = b.labour||0;
-    $('#materials').value = b.materials||0;
-    renderPension();
-  }
-
-  function onBandInput(){
-    const b = state.band;
-    b.name = $('#bandName').value; b.rating = num($('#rating').value); b.allegiance = $('#allegiance').value; b.notes = $('#notes').value; b.archetype = $('#archetype').value; b.stashed = $('#stashed').value; b.upgrades = $('#upgrades').value; b.treasury = num($('#treasury').value); b.labour = num($('#labour').value); b.materials = num($('#materials').value);
-    save();
-  }
-
-  function renderPension(){
-    const wrap = refs.pensionWrap; wrap.innerHTML = '';
-    state.band.pension.forEach((name, idx)=>{
-      const chip = document.createElement('span'); chip.className='chip';
-      chip.innerHTML = `<span>🕯️ ${escapeHtml(name)}</span> <button class="btn ghost" style="padding:2px 6px" data-i="${idx}">×</button>`;
-      chip.querySelector('button').addEventListener('click',()=>{ state.band.pension.splice(idx,1); renderPension(); save(); });
-      wrap.appendChild(chip);
-    });
-  }
-  function addPension(){ const v = refs.pensionInput.value.trim(); if(!v) return; state.band.pension.push(v); refs.pensionInput.value=''; renderPension(); save(); }
-
-  function renderMembers(){
-    const container = refs.members; container.innerHTML = '';
-    state.members.forEach((m, idx)=>{
-      const el = document.createElement('div'); el.className='member'; el.dataset.id = m.id; el.innerHTML = memberTemplate(m, idx); wireMember(el, m); container.appendChild(el);
-    });
-    $$('.auto').forEach(t=>autoSize(t));
-  }
-
-  function memberTemplate(m, idx){
-    return `
-      <div class=\"mini\" style=\"justify-content:space-between; display:flex; margin-bottom:6px\">
-        <span>Member ${idx+1}</span>
-        <span>
-          <button class=\"btn ghost\" data-act=\"dup\">Duplicate</button>
-          <button class=\"btn danger\" data-act=\"del\">Remove</button>
-        </span>
-      </div>
-      <div class=\"top\">
-        ${textField('Name','name',m.name)}
-        ${textField('Species','species',m.species)}
-        ${number('Level','level',m.level)}
-        ${dieField('Presence','presence',m.presence)}
-        ${dieField('Fortitude','fortitude',m.fortitude)}
-      </div>
-      <div class=\"band-field\"><label>Skills</label><textarea class=\"auto\" data-key=\"skills\" placeholder=\"Talents, abilities, traits...\">${escapeHtml(m.skills||'')}</textarea></div>
-      <div class=\"band-field\"><label>Spells</label><textarea class=\"auto\" data-key=\"spells\" placeholder=\"Spell names, notes, ranges, costs...\">${escapeHtml(m.spells||'')}</textarea></div>
-      <div class=\"attrs\">
-        ${dieAttr('Move','move',m.attrs.move)}
-        ${dieAttr('Strike','strike',m.attrs.strike)}
-        ${dieAttr('Block','block',m.attrs.block)}
-        ${dieAttr('Ranged','ranged',m.attrs.ranged)}
-        ${dieAttr('Nimbleness','nimbleness',m.attrs.nimbleness)}
-        ${dieAttr('Concealment','concealment',m.attrs.concealment)}
-        ${dieAttr('Awareness','awareness',m.attrs.awareness)}
-      </div>
-      <div class=\"equip\">
-        <div class=\"band-field\"><label>Weapon 1</label><input type=\"text\" data-key=\"equip.weapon1\" value=\"${escapeHtml(m.equip.weapon1||'')}\"/></div>
-        <div class=\"band-field\"><label>Armour 1</label><input type=\"text\" data-key=\"equip.armour1\" value=\"${escapeHtml(m.equip.armour1||'')}\"/></div>
-        <div class=\"band-field\"><label>Item</label><input type=\"text\" data-key=\"equip.item\" value=\"${escapeHtml(m.equip.item||'')}\"/></div>
-        <div class=\"band-field\"><label>Weapon 2</label><input type=\"text\" data-key=\"equip.weapon2\" value=\"${escapeHtml(m.equip.weapon2||'')}\"/></div>
-        <div class=\"band-field\"><label>Armour 2</label><input type=\"text\" data-key=\"equip.armour2\" value=\"${escapeHtml(m.equip.armour2||'')}\"/></div>
-        <div class=\"band-field\"><label>Special</label><input type=\"text\" data-key=\"equip.special\" value=\"${escapeHtml(m.equip.special||'')}\"/></div>
-      </div>
-      <div class=\"tracks\">
-        <div class=\"track\" data-track=\"fate\"><h3>Fate</h3><div class=\"pips\">${pips(6, m.fate)}</div></div>
-        <div class=\"track\" data-track=\"exp\"><h3>Experience</h3><div class=\"pips\">${pips(12, m.exp)}</div></div>
-        <div class=\"track\" data-track=\"wounds\">
-          <h3>Wounds</h3>
-          <div class=\"pips\">${pips(m.wounds.max, m.wounds.current)}</div>
-          <div class=\"wound-controls\">
-            <label style=\"font-variant:small-caps\">Max</label>
-            <input type=\"number\" data-key=\"wounds.max\" min=\"1\" step=\"1\" value=\"${m.wounds.max}\" style=\"width:80px\"/>
-            <button class=\"btn ghost\" data-w=\"-1\">−</button>
-            <button class=\"btn ghost\" data-w=\"+1\">+</button>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  function textField(labelTxt, key, val){ return `<div class=\"band-field\"><label>${labelTxt}</label><input type=\"text\" data-key=\"${key}\" value=\"${escapeHtml(val||'')}\"/></div>`; }
-  function number(labelTxt, key, val){ return `<div class=\"band-field\"><label>${labelTxt}</label><input type=\"number\" step=\"1\" data-key=\"${key}\" value=\"${Number(val)||0}\"/></div>`; }
-  function dieAttr(labelTxt, key, val){ return `<div class=\"band-field\"><label>${labelTxt}</label>${dieSelect(`attrs.${key}`, normalizeDie(val))}</div>`; }
-  function dieField(labelTxt, key, val){ return `<div class=\"band-field\"><label>${labelTxt}</label>${dieSelect(key, normalizeDie(val))}</div>`; }
-  function dieSelect(key, val){ const opts = DICE.map(d=>`<option value=\"${d}\" ${val===d? 'selected':''}>${d.toUpperCase()}</option>`).join(''); return `<select data-key=\"${key}\">${opts}</select>`; }
-
-  function pips(n, active){ let out=''; for(let i=1;i<=Math.max(0,n);i++){ out += `<div class=\"dot ${i<=active? 'on':''}\" data-i=\"${i}\"></div>`; } return out; }
-
-  function wireMember(el, m){
-    el.querySelectorAll('input[data-key], textarea[data-key]').forEach(inp=>{ inp.addEventListener('input', ()=>{ setDeep(m, inp.dataset.key, inp.type==='number'? num(inp.value) : inp.value); save(); }); });
-    el.querySelectorAll('select[data-key]').forEach(sel=>{ sel.addEventListener('change', ()=>{ setDeep(m, sel.dataset.key, sel.value); save(); }); });
-    el.querySelectorAll('.track').forEach(tr=>{
-      const type = tr.dataset.track;
-      tr.querySelectorAll('.dot').forEach(dot=>{
-        dot.addEventListener('click',()=>{
-          const i = num(dot.dataset.i);
-          if(type==='wounds') m.wounds.current = (m.wounds.current===i)? i-1 : i; else m[type] = (m[type]===i)? i-1 : i;
-          renderMembers(); save();
-        });
+    // PDF export
+    $('export-btn')?.addEventListener('click', () => {
+      const target = $('warband-sheet');
+      if (!target) return alert('Page not ready.');
+      if (!window.html2canvas || !window.jspdf) return alert('PDF libraries not loaded.');
+      html2canvas(target, { scale: 2, backgroundColor: null }).then(canvas => {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p','mm','a4');
+        const imgData = canvas.toDataURL('image/png');
+        const imgWidth = 210, pageHeight = 297;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        let heightLeft = imgHeight, position = 0;
+        pdf.addImage(imgData,'PNG',0,position,imgWidth,imgHeight);
+        heightLeft -= pageHeight;
+        while(heightLeft > 0){
+          position = heightLeft - imgHeight;
+          pdf.addPage();
+          pdf.addImage(imgData,'PNG',0,position,imgWidth,imgHeight);
+          heightLeft -= pageHeight;
+        }
+        pdf.save('warband-sheet.pdf');
       });
     });
-    el.querySelectorAll('[data-w]').forEach(btn=>{ btn.addEventListener('click', ()=>{ const delta = btn.dataset.w === '+1' ? 1 : -1; m.wounds.current = clamp(m.wounds.current + delta, 0, m.wounds.max); renderMembers(); save(); }); });
-    const del = el.querySelector('[data-act=\"del\"]'); if(del) del.addEventListener('click',()=>{ state.members = state.members.filter(mm=>mm.id!==m.id); renderMembers(); save(); });
-    const dup = el.querySelector('[data-act=\"dup\"]'); if(dup) dup.addEventListener('click',()=>{ const copy = JSON.parse(JSON.stringify(m)); copy.id = crypto.randomUUID(); state.members.splice(state.members.indexOf(m)+1,0,copy); renderMembers(); save(); });
-  }
 
-  function autoSize(t){ t.style.height = 'auto'; t.style.height = (t.scrollHeight+2)+'px'; t.addEventListener('input', ()=>{ t.style.height='auto'; t.style.height=(t.scrollHeight+2)+'px'; }); }
+    // Data helpers
+    function collectData(){
+      const ambitions = [];
+      for(let i=1;i<=6;i++){
+        ambitions.push({
+          check: !!$(`ambition-check${i}`)?.checked,
+          text:  $(`ambition-text${i}`)?.value || ''
+        });
+      }
 
-  function setDeep(obj, path, value){ const parts = path.split('.'); let cur = obj; for(let i=0;i<parts.length-1;i++){ const k = parts[i]; if(!(k in cur)) cur[k] = {}; cur = cur[k]; } cur[parts[parts.length-1]] = value; }
-  function num(v){ return (v===''||v===null||v===undefined)? 0 : Number(v); }
-  function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
-  function escapeHtml(str){ return String(str).replace(/[&<>"']/g, s=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[s])); }
+      const data = {
+        player: $('player')?.value || '',
+        warband: $('warband')?.value || '',
+        faction: $('faction')?.value || '',
+        leader: {
+          name: $('leader')?.value || '',
+          class: $('leader-class')?.value || '',
+          status: $('leader-status')?.value || '',
+          renown: $('leader-renown')?.value || '',
+          skill: $('leader-skill')?.value || '',
+          ability: $('leader-ability')?.value || '',
+          quality: $('leader-quality')?.value || '',
+          status_detail: $('leader-status-detail')?.value || '',
+          gear: $('leader-gear')?.value || '',
+          cost: $('leader-cost')?.value || '',
+          fee: $('leader-fee')?.value || ''
+        },
+        ambitions,
+        battles: { horror: [], conflict: [], event: [], renown: [], prestige: [] },
+        climax: { scenario_role: $('scenario-role')?.value || '' },
+        followers: [],
+        outcome: $('outcome')?.value || 'Victorious',
+        total: $('total')?.value || ''
+      };
 
-  function addMember(){ state.members.push(blankMember()); renderMembers(); save(); }
+      for(let i=1; i<=19; i++){
+        data.battles.horror.push($(`horror${i}`)?.value || '');
+        data.battles.conflict.push($(`conflict${i}`)?.value || '');
+        data.battles.event.push($(`event${i}`)?.value || '');
+        data.battles.renown.push(!!$(`renown${i}`)?.checked);
+        data.battles.prestige.push(!!$(`prestige${i}`)?.checked);
+      }
+      data.battles.horror.push($('horrorClimax')?.value || '');
+      data.battles.conflict.push($('conflictClimax')?.value || '');
+      data.battles.event.push($('eventClimax')?.value || '');
+      data.battles.renown.push(!!$('renownClimax')?.checked);
+      data.battles.prestige.push(!!$('prestigeClimax')?.checked);
 
-  function exportJSON(){ const data = JSON.stringify(state, null, 2); $('#jsonArea').value = data; refs.jsonBox.open = true; }
-  function downloadJSON(){ const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); const name = (state.band.name||'warband').replace(/[^a-z0-9]+/gi,'_').replace(/^_|_$/g,''); a.href = url; a.download = `${name||'warband'}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); }
-  function importFromTextarea(){ const raw = $('#jsonArea').value.trim(); if(!raw) return alert('Paste JSON into the box first.'); try{ const data = JSON.parse(raw); if(!data || typeof data !== 'object') throw new Error('Bad JSON'); Object.assign(state.band, data.band||{}); state.members = Array.isArray(data.members)? data.members.map(upgradeMember) : []; bindBand(); renderMembers(); save(); alert('Imported successfully.'); }catch(e){ alert('Invalid JSON. Check your paste and try again.'); } }
+      for(let i=1; i<=6; i++){
+        data.followers.push({
+          follower: $(`follower${i}-follower`)?.value || '',
+          class: $(`follower${i}-class`)?.value || '',
+          quality: $(`follower${i}-quality`)?.value || '',
+          status: $(`follower${i}-status`)?.value || '',
+          cost: $(`follower${i}-cost`)?.value || '',
+          fee:  $(`follower${i}-fee`)?.value || '',
+          skill: $(`follower${i}-skill`)?.value || '',
+          ability: $(`follower${i}-ability`)?.value || '',
+          gear: $(`follower${i}-gear`)?.value || ''
+        });
+      }
+      return data;
+    }
 
-  function clearAll(){ if(!confirm('Clear all data from this sheet? This cannot be undone.')) return; state.band = { name:"", rating:0, allegiance:"", notes:"", archetype:"", stashed:"", upgrades:"", treasury:0, labour:0, materials:0, pension:[] }; state.members = []; bindBand(); renderMembers(); save(); }
+    function populateFromData(data){
+      if (!data || typeof data !== 'object') return;
+      const setVal = (id, val) => { const el = $(id); if (el) el.value = (val ?? ''); };
+      const setChk = (id, val) => { const el = $(id); if (el) el.checked = !!val; };
 
-  [refs.bandName, refs.rating, refs.allegiance, refs.notes, refs.archetype, refs.stashed, refs.upgrades, refs.treasury, refs.labour, refs.materials].forEach(el=>{ el.addEventListener('input', onBandInput); });
-  refs.pensionAdd.addEventListener('click', addPension);
-  refs.pensionInput.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); addPension(); } });
+      setVal('player', data.player);
+      setVal('warband', data.warband);
+      setVal('faction', data.faction);
 
-  refs.addMember.addEventListener('click', addMember);
-  refs.exportBtn.addEventListener('click', exportJSON);
-  refs.downloadBtn.addEventListener('click', downloadJSON);
-  refs.importFromBox.addEventListener('click', importFromTextarea);
-  refs.clearAll.addEventListener('click', clearAll);
+      setVal('leader', data.leader?.name);
+      setVal('leader-class', data.leader?.class);
+      setVal('leader-status', data.leader?.status);
+      setVal('leader-renown', data.leader?.renown);
+      setVal('leader-skill', data.leader?.skill);
+      setVal('leader-ability', data.leader?.ability);
+      setVal('leader-quality', data.leader?.quality);
+      setVal('leader-status-detail', data.leader?.status_detail);
+      setVal('leader-gear', data.leader?.gear);
+      setVal('leader-cost', data.leader?.cost);
+      setVal('leader-fee', data.leader?.fee);
 
-  load(); bindBand(); renderMembers(); if(state.members.length===0){ addMember(); }
-})();
-</script>
+      for(let i=1;i<=6;i++){
+        const a = data.ambitions?.[i-1] || {};
+        setChk(`ambition-check${i}`, a.check);
+        setVal(`ambition-text${i}`, a.text || '');
+      }
+
+      for(let i=1;i<=19;i++){
+        setVal(`horror${i}`, data.battles?.horror?.[i-1] || '');
+        setVal(`conflict${i}`, data.battles?.conflict?.[i-1] || '');
+        setVal(`event${i}`, data.battles?.event?.[i-1] || '');
+        setChk(`renown${i}`, data.battles?.renown?.[i-1]);
+        setChk(`prestige${i}`, data.battles?.prestige?.[i-1]);
+      }
+      setVal('horrorClimax', data.battles?.horror?.[19] || '');
+      setVal('conflictClimax', data.battles?.conflict?.[19] || '');
+      setVal('eventClimax', data.battles?.event?.[19] || '');
+      setChk('renownClimax', data.battles?.renown?.[19]);
+      setChk('prestigeClimax', data.battles?.prestige?.[19]);
+      setVal('scenario-role', data.climax?.scenario_role || '');
+
+      for(let i=1;i<=6;i++){
+        const f = data.followers?.[i-1] || {};
+        setVal(`follower${i}-follower`, f.follower);
+        setVal(`follower${i}-class`, f.class);
+        setVal(`follower${i}-quality`, f.quality);
+        setVal(`follower${i}-status`, f.status);
+        setVal(`follower${i}-cost`, f.cost);
+        setVal(`follower${i}-fee`, f.fee);
+        setVal(`follower${i}-skill`, f.skill);
+        setVal(`follower${i}-ability`, f.ability);
+        setVal(`follower${i}-gear`, f.gear);
+      }
+
+      setVal('outcome', data.outcome ?? 'Victorious');
+      setVal('total', data.total ?? '');
+
+      if((data?.battles?.horror?.length || 0) > 0){ setTab('campaign'); }
+    }
+
+    // File JSON Export/Import
+    $('export-json-btn')?.addEventListener('click', () => {
+      try{
+        const jsonString = JSON.stringify(collectData(), null, 2);
+        const blob = new Blob([jsonString], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'warband.json'; a.click();
+        URL.revokeObjectURL(url);
+      }catch(err){
+        console.error(err);
+        alert('Could not generate JSON.');
+      }
+    });
+
+    const importFileInput = $('import-file');
+    $('import-btn')?.addEventListener('click', () => {
+      const file = importFileInput?.files?.[0];
+      if(!file) return alert('Choose a JSON file first.');
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try{
+          const data = JSON.parse(e.target.result || '{}');
+          populateFromData(data);
+        }catch(err){
+          console.error(err);
+          alert('Could not parse JSON file. Check the content.');
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    // Textarea JSON I/O (No file picker)
+    const detailsBox = document.querySelector('details.json-io');
+    const jsonBox = $('json-io-text');
+
+    $('export-to-box-btn')?.addEventListener('click', () => {
+      try{
+        const jsonString = JSON.stringify(collectData(), null, 2);
+        if (jsonBox) jsonBox.value = jsonString;
+        if (detailsBox) detailsBox.open = true;
+      }catch(err){
+        console.error(err);
+        alert('Failed to create JSON.');
+      }
+    });
+
+    $('copy-box-btn')?.addEventListener('click', async () => {
+      try{
+        await navigator.clipboard.writeText(jsonBox?.value || '');
+        alert('JSON copied to clipboard');
+      }catch(e){
+        alert('Clipboard not available. Select and copy manually.');
+      }
+    });
+
+    $('import-from-box-btn')?.addEventListener('click', () => {
+      const text = (jsonBox?.value || '').trim();
+      if(!text){ alert('Paste JSON into the box first.'); return; }
+      try{
+        const data = JSON.parse(text);
+        populateFromData(data);
+        alert('Imported from box successfully.');
+      }catch(err){
+        console.error(err);
+        alert('Invalid JSON in the box. Please check your content.');
+      }
+    });
+
+    $('clear-box-btn')?.addEventListener('click', () => { if (jsonBox) jsonBox.value = ''; });
+
+    // Autosave
+    const AUTOSAVE_KEY = 'warband_autosave';
+    const doAutosave = () => {
+      try {
+        const jsonString = JSON.stringify(collectData());
+        localStorage.setItem(AUTOSAVE_KEY, jsonString);
+      } catch (e) {}
+    };
+    let autosaveTimer = null;
+    const scheduleAutosave = () => {
+      clearTimeout(autosaveTimer);
+      autosaveTimer = setTimeout(doAutosave, 500);
+    };
+    document.addEventListener('input', scheduleAutosave);
+    document.addEventListener('change', scheduleAutosave);
+
+    // Load autosave if present
+    try{
+      const saved = localStorage.getItem(AUTOSAVE_KEY);
+      if (saved) populateFromData(JSON.parse(saved));
+    }catch(e){}
+  });
+  </script>
 </body>
 </html>
