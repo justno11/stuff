@@ -20,12 +20,12 @@
       --shadow: 0 10px 30px rgba(0,0,0,.35);
     }
 
-    * , *::before, *::after{ box-sizing:border-box; }
-    html,body{height:100%;}
-    body{margin:0; background:linear-gradient(180deg, #0c100a, var(--bg)); font-family: ui-serif, Georgia, "Times New Roman", serif; color:var(--ink); line-height:1.25;}
+    *,*::before,*::after{ box-sizing:border-box; }
+    html,body{height:100%}
+    body{margin:0; background:linear-gradient(180deg,#0c100a,var(--bg)); font-family: ui-serif, Georgia, "Times New Roman", serif; color:var(--ink); line-height:1.25}
 
     .wrap{max-width:1100px; margin:24px auto; padding:20px}
-    .sheet{background: radial-gradient(2000px 700px at 50% -10%, #fff2c9 0%, var(--paper) 40%, var(--paper-2) 100%); border: 1px solid #dccb8f; border-radius:18px; box-shadow:var(--shadow); position:relative; overflow:hidden}
+    .sheet{background: radial-gradient(2000px 700px at 50% -10%, #fff2c9 0%, var(--paper) 40%, var(--paper-2) 100%); border:1px solid #dccb8f; border-radius:18px; box-shadow:var(--shadow); position:relative; overflow:hidden}
     .sheet:before,.sheet:after{content:""; position:absolute; inset:0; pointer-events:none; background:radial-gradient(20px 20px at 15% 8%, rgba(60,110,71,.35) 20%, transparent 42%), radial-gradient(18px 18px at 10% 14%, rgba(60,110,71,.25) 18%, transparent 40%), radial-gradient(16px 16px at 90% 10%, rgba(60,110,71,.30) 22%, transparent 45%), conic-gradient(from 60deg at 10% 100%, rgba(47,88,57,.17), transparent 25%), conic-gradient(from 120deg at 100% 0%, rgba(47,88,57,.17), transparent 25%); mix-blend-mode:multiply; opacity:.85}
 
     header{display:grid; grid-template-columns:1.2fr .8fr .8fr; gap:12px; padding:24px 24px 12px; border-bottom:2px dashed var(--line)}
@@ -34,7 +34,7 @@
 
     .band-field{display:flex; flex-direction:column; gap:6px}
     label{font-variant:small-caps; letter-spacing:.08em; font-size:13px; color:#4a3e21}
-    input[type="text"], input[type="number"], textarea, select{border:1px solid #cdbf83; background:linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.2)); padding:10px 12px; border-radius:9px; outline:none; color:#1f1a0e; box-shadow: inset 0 1px 0 rgba(255,255,255,.4), inset 0 -2px 8px rgba(0,0,0,.06); width:100%;}
+    input[type="text"], input[type="number"], textarea, select{border:1px solid #cdbf83; background:linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.2)); padding:10px 12px; border-radius:9px; outline:none; color:#1f1a0e; box-shadow: inset 0 1px 0 rgba(255,255,255,.4), inset 0 -2px 8px rgba(0,0,0,.06); width:100%}
     select{cursor:pointer}
     textarea{min-height:88px; resize:vertical}
     textarea.auto{min-height:88px; resize:none}
@@ -48,11 +48,12 @@
 
     .members{padding:16px 24px}
     .member{background:linear-gradient(180deg, #fff7d2, #eddba2); border:1px solid #d4c785; border-radius:14px; padding:12px; margin-bottom:12px; position:relative}
-    .member .top{display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr; gap:10px; margin-bottom:8px} 
+    /* Top row now has 6 columns: Name, Species, Level, Fee, Presence, Fortitude */
+    .member .top{display:grid; grid-template-columns:2fr 1fr .8fr .8fr .8fr .8fr; gap:10px; margin-bottom:8px}
 
     .attrs{display:grid; grid-template-columns:repeat(7, 1fr); gap:6px; margin-top:8px}
 
-    /* Equipment: fixed 3 columns -> 2 -> 1, stable widths */
+    /* Equipment: fixed 3 columns -> 2 -> 1 */
     .equip{display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:10px; margin-top:8px}
 
     .btn{background:linear-gradient(180deg, #3e7b4f, #2f5b3a); color:#f6f3e7; border:1px solid #1e3a28; padding:8px 12px; border-radius:10px; cursor:pointer; box-shadow:0 2px 0 rgba(0,0,0,.15); font-weight:600; letter-spacing:.3px}
@@ -85,14 +86,12 @@
 
     @media (max-width: 960px){
       header{grid-template-columns:1fr}
-      .member .top{grid-template-columns:1fr 1fr;}
+      .member .top{grid-template-columns:1fr 1fr}
       .attrs{grid-template-columns:repeat(3, 1fr)}
       .tracks{grid-template-columns:1fr}
-      .equip{grid-template-columns: repeat(2, minmax(0, 1fr));}
+      .equip{grid-template-columns: repeat(2, minmax(0, 1fr))}
     }
-    @media (max-width: 560px){
-      .equip{grid-template-columns: 1fr;}
-    }
+    @media (max-width: 560px){ .equip{grid-template-columns: 1fr} }
   </style>
 </head>
 <body>
@@ -191,16 +190,15 @@
     return {
       id: crypto.randomUUID(),
       name:"", species:"",
-      level:1, // numeric per rules
+      level:1, // numeric
+      fee:0,   // new numeric Fee
       presence:"d6", fortitude:"d6", // dice selectors
-      fee:0,
       skills:"", spells:"",
       attrs:{ move:"d6", strike:"d6", block:"d6", ranged:"d6", nimbleness:"d6", concealment:"d6", awareness:"d6" },
       equip:{ weapon1:"", weapon2:"", armour1:"", armour2:"", item:"", special:"" },
       fate:0, exp:0,
       wounds:{ current:0, max:6 }
     };
-  };
   }
 
   function save(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
@@ -219,12 +217,14 @@
   function upgradeMember(m){
     const base = blankMember();
     const merged = Object.assign(base, m);
-    if(typeof merged.level === 'string'){
-      if(/^d(2|4|6|8|10|12|20)$/i.test(merged.level)) merged.level = 1; else merged.level = Number(merged.level)||1;
-    }else{ merged.level = Number(merged.level)||1; }
+    // Level numeric
+    merged.level = Number(merged.level); if(!Number.isFinite(merged.level)) merged.level = 1;
+    // Fee numeric
+    merged.fee = Number(merged.fee); if(!Number.isFinite(merged.fee)) merged.fee = 0;
+    // Normalize dice
     merged.presence = normalizeDie(merged.presence);
     merged.fortitude = normalizeDie(merged.fortitude);
-    merged.fee = Number(merged.fee)||0;
+    // Core attrs
     merged.attrs = convertAttrsToDice(merged.attrs);
     if(!merged.spells) merged.spells = "";
     if(merged.wounds && typeof merged.wounds === 'object'){
