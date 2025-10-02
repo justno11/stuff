@@ -191,7 +191,7 @@
     return {
       id: crypto.randomUUID(),
       name:"", species:"",
-      level:"d6", presence:"d6", fortitude:"d6",
+      level:0, presence:\"d6\", fortitude:\"d6\",
       skills:"", spells:"",
       attrs:{ move:"d6", strike:"d6", block:"d6", ranged:"d6", nimbleness:"d6", concealment:"d6", awareness:"d6" },
       equip:{ weapon1:"", weapon2:"", armour1:"", armour2:"", item:"", special:"" },
@@ -216,7 +216,7 @@
   function upgradeMember(m){
     const base = blankMember();
     const merged = Object.assign(base, m);
-    merged.level = normalizeDie(merged.level);
+    merged.level = (typeof merged.level === 'string' && /^d/i.test(merged.level)) ? 0 : (Number(merged.level) || 0);
     merged.presence = normalizeDie(merged.presence);
     merged.fortitude = normalizeDie(merged.fortitude);
     merged.attrs = convertAttrsToDice(merged.attrs);
@@ -289,7 +289,7 @@
       <div class=\"top\">
         ${textField('Name','name',m.name)}
         ${textField('Species','species',m.species)}
-        ${dieField('Level','level',m.level)}
+        ${number('Level','level',m.level)}
         ${dieField('Presence','presence',m.presence)}
         ${dieField('Fortitude','fortitude',m.fortitude)}
       </div>
