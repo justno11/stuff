@@ -7,36 +7,48 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Cinzel:wght@400;700&display=swap');
+
         body {
             background: linear-gradient(to bottom, #0a0606, #1a0f0f);
             font-family: 'Cinzel', serif;
         }
+
         .title {
             font-family: 'UnifrakturMaguntia', cursive;
         }
-        .struck {
+
+        .struck-text {
             text-decoration: line-through;
             opacity: 0.4;
             color: #9f7a7a;
-            pointer-events: none;
         }
+
+        .struck-card {
+            opacity: 0.55;
+        }
+
         .section-header {
             border-bottom: 3px solid #9c1c1c;
         }
+
         .memory-card, .diary-card {
             transition: all 0.3s ease;
             border: 2px solid #9c1c1c;
         }
+
         .memory-card:hover, .diary-card:hover {
             box-shadow: 0 0 15px #9c1c1c;
         }
+
         .list-item {
             transition: all 0.2s ease;
         }
     </style>
 </head>
+
 <body class="text-[#e8d5c0] min-h-screen pb-12">
     <div class="max-w-7xl mx-auto px-6 py-8">
+
         <!-- Header -->
         <div class="text-center mb-12">
             <h1 class="title text-7xl text-[#9c1c1c] tracking-widest drop-shadow-md">THOUSAND YEAR OLD VAMPIRE</h1>
@@ -46,8 +58,8 @@
         <!-- Name -->
         <div class="mb-10">
             <label class="block text-[#9f7a7a] text-lg mb-2 tracking-wider">YOUR NAME</label>
-            <input id="name-input" 
-                   type="text" 
+            <input id="name-input"
+                   type="text"
                    class="w-full max-w-lg bg-[#1a1111] border-2 border-[#9c1c1c] focus:border-[#e63939] text-3xl p-5 outline-none rounded-none">
         </div>
 
@@ -58,9 +70,9 @@
             <div>
                 <h2 class="section-header text-3xl text-[#9c1c1c] pb-3 mb-4">SKILLS</h2>
                 <div class="flex gap-3 mb-6">
-                    <input id="skills-input" type="text" placeholder="new skill..." 
+                    <input id="skills-input" type="text" placeholder="new skill..."
                            class="flex-1 bg-[#1a1111] border border-[#9c1c1c] p-4 text-lg outline-none">
-                    <button onclick="addItem('skills')" 
+                    <button onclick="addItem('skills')"
                             class="bg-[#9c1c1c] hover:bg-[#e63939] w-12 flex items-center justify-center text-3xl leading-none text-white">+</button>
                 </div>
                 <ul id="skills-list" class="space-y-3 min-h-[200px]"></ul>
@@ -70,9 +82,9 @@
             <div>
                 <h2 class="section-header text-3xl text-[#9c1c1c] pb-3 mb-4">RESOURCES</h2>
                 <div class="flex gap-3 mb-6">
-                    <input id="resources-input" type="text" placeholder="new resource..." 
+                    <input id="resources-input" type="text" placeholder="new resource..."
                            class="flex-1 bg-[#1a1111] border border-[#9c1c1c] p-4 text-lg outline-none">
-                    <button onclick="addItem('resources')" 
+                    <button onclick="addItem('resources')"
                             class="bg-[#9c1c1c] hover:bg-[#e63939] w-12 flex items-center justify-center text-3xl leading-none text-white">+</button>
                 </div>
                 <ul id="resources-list" class="space-y-3 min-h-[200px]"></ul>
@@ -82,9 +94,9 @@
             <div>
                 <h2 class="section-header text-3xl text-[#9c1c1c] pb-3 mb-4">CHARACTERS</h2>
                 <div class="flex gap-3 mb-6">
-                    <input id="characters-input" type="text" placeholder="new character..." 
+                    <input id="characters-input" type="text" placeholder="new character..."
                            class="flex-1 bg-[#1a1111] border border-[#9c1c1c] p-4 text-lg outline-none">
-                    <button onclick="addItem('characters')" 
+                    <button onclick="addItem('characters')"
                             class="bg-[#9c1c1c] hover:bg-[#e63939] w-12 flex items-center justify-center text-3xl leading-none text-white">+</button>
                 </div>
                 <ul id="characters-list" class="space-y-3 min-h-[200px]"></ul>
@@ -94,9 +106,9 @@
             <div>
                 <h2 class="section-header text-3xl text-[#9c1c1c] pb-3 mb-4">MARKS</h2>
                 <div class="flex gap-3 mb-6">
-                    <input id="marks-input" type="text" placeholder="new mark..." 
+                    <input id="marks-input" type="text" placeholder="new mark..."
                            class="flex-1 bg-[#1a1111] border border-[#9c1c1c] p-4 text-lg outline-none">
-                    <button onclick="addItem('marks')" 
+                    <button onclick="addItem('marks')"
                             class="bg-[#9c1c1c] hover:bg-[#e63939] w-12 flex items-center justify-center text-3xl leading-none text-white">+</button>
                 </div>
                 <ul id="marks-list" class="space-y-3 min-h-[200px]"></ul>
@@ -106,8 +118,10 @@
         <!-- Memories -->
         <div class="mb-16">
             <div class="flex justify-between items-baseline mb-6">
-                <h2 class="text-4xl text-[#9c1c1c] title">MEMORIES <span id="memory-count" class="text-[#e63939] text-2xl">(0/5 active)</span></h2>
-                <button onclick="addMemory()" 
+                <h2 class="text-4xl text-[#9c1c1c] title">
+                    MEMORIES <span id="memory-count" class="text-[#e63939] text-2xl">(0/5 active)</span>
+                </h2>
+                <button onclick="addMemory()"
                         class="bg-[#1a1111] border-2 border-[#9c1c1c] hover:border-[#e63939] px-8 py-4 text-xl font-bold">+ NEW MEMORY</button>
             </div>
             <div id="memories-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
@@ -116,7 +130,9 @@
         <!-- Diary -->
         <div>
             <div class="flex justify-between items-baseline mb-6">
-                <h2 class="text-4xl text-[#9c1c1c] title">DIARY <span id="diary-count" class="text-[#e63939] text-2xl">(0/4)</span></h2>
+                <h2 class="text-4xl text-[#9c1c1c] title">
+                    DIARY <span id="diary-count" class="text-[#e63939] text-2xl">(0/4)</span>
+                </h2>
             </div>
             <div id="diary-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
         </div>
@@ -129,19 +145,42 @@
             resources: [],
             characters: [],
             marks: [],
-            memories: [], // {id, name, struck, experiences: [{id, text, struck}]}
-            diary: []     // same structure as memories
+            memories: [],
+            diary: []
         };
 
         function generateId() {
             return Date.now().toString(36) + Math.random().toString(36).substr(2);
         }
 
+        function escapeHtml(value) {
+            return String(value ?? "")
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
+
+        function escapeAttribute(value) {
+            return escapeHtml(value);
+        }
+
         function loadData() {
             const saved = localStorage.getItem('tyov-sheet');
+
             if (saved) {
                 data = JSON.parse(saved);
             }
+
+            data.name = data.name || "";
+            data.skills = data.skills || [];
+            data.resources = data.resources || [];
+            data.characters = data.characters || [];
+            data.marks = data.marks || [];
+            data.memories = data.memories || [];
+            data.diary = data.diary || [];
+
             document.getElementById('name-input').value = data.name || '';
         }
 
@@ -153,12 +192,19 @@
             if (listName === 'memories' || listName === 'diary') {
                 const list = listName === 'memories' ? data.memories : data.diary;
                 const item = list.find(i => i.id === itemId);
-                if (item) item.struck = !item.struck;
+
+                if (item) {
+                    item.struck = !item.struck;
+                }
             } else {
                 const list = data[listName];
                 const item = list.find(i => i.id === itemId);
-                if (item) item.struck = !item.struck;
+
+                if (item) {
+                    item.struck = !item.struck;
+                }
             }
+
             saveData();
             renderAll();
         }
@@ -167,11 +213,31 @@
             if (listName === 'memories' || listName === 'diary') {
                 const list = listName === 'memories' ? data.memories : data.diary;
                 const idx = list.findIndex(i => i.id === itemId);
-                if (idx > -1) list.splice(idx, 1);
+
+                if (idx > -1) {
+                    list.splice(idx, 1);
+                }
             } else {
-                // no delete for the four lists anymore
                 return;
             }
+
+            saveData();
+            renderAll();
+        }
+
+        function deleteExperience(memId, expId) {
+            const memory = data.memories.find(m => m.id === memId);
+
+            if (!memory) {
+                return;
+            }
+
+            const idx = memory.experiences.findIndex(e => e.id === expId);
+
+            if (idx > -1) {
+                memory.experiences.splice(idx, 1);
+            }
+
             saveData();
             renderAll();
         }
@@ -179,8 +245,17 @@
         function addItem(listName) {
             const input = document.getElementById(listName + '-input');
             const text = input.value.trim();
-            if (!text) return;
-            data[listName].push({ id: generateId(), text, struck: false });
+
+            if (!text) {
+                return;
+            }
+
+            data[listName].push({
+                id: generateId(),
+                text,
+                struck: false
+            });
+
             input.value = '';
             saveData();
             renderAll();
@@ -188,12 +263,16 @@
 
         function renderList(listName) {
             const container = document.getElementById(listName + '-list');
-            if (!container) return;
+
+            if (!container) {
+                return;
+            }
+
             container.innerHTML = data[listName].map(item => `
-                <li class="list-item flex justify-between items-center bg-[#1a1111] border border-[#9c1c1c] p-4 ${item.struck ? 'struck' : ''}">
-                    <span class="text-lg">${item.text}</span>
-                    <button onclick="event.stopImmediatePropagation(); toggleStrike('${listName}', '${item.id}');" 
-                            class="text-sm px-6 py-2 border border-[#9c1c1c] hover:bg-[#9c1c1c] hover:text-white font-bold">
+                <li class="list-item flex items-center bg-[#1a1111] border border-[#9c1c1c] p-4">
+                    <span class="text-lg flex-1 ${item.struck ? 'struck-text' : ''}">${escapeHtml(item.text)}</span>
+                    <button onclick="event.stopImmediatePropagation(); toggleStrike('${listName}', '${item.id}');"
+                            class="ml-auto text-sm px-6 py-2 border border-[#9c1c1c] hover:bg-[#9c1c1c] hover:text-white font-bold">
                         ${item.struck ? 'UNSTRIKE' : 'STRIKE'}
                     </button>
                 </li>
@@ -202,28 +281,44 @@
 
         function addMemory() {
             const active = data.memories.filter(m => !m.struck).length;
+
             if (active >= 5) {
                 alert("You have reached the limit of 5 active memories.");
                 return;
             }
+
             data.memories.push({
                 id: generateId(),
                 name: "New Memory",
                 struck: false,
                 experiences: []
             });
+
             saveData();
             renderAll();
         }
 
         function addExperience(memId) {
             const memory = data.memories.find(m => m.id === memId);
-            if (!memory) return;
+
+            if (!memory) {
+                return;
+            }
+
             const inputId = `exp-input-${memId}`;
             const input = document.getElementById(inputId);
             const text = input ? input.value.trim() : '';
-            if (!text) return;
-            memory.experiences.push({ id: generateId(), text, struck: false });
+
+            if (!text) {
+                return;
+            }
+
+            memory.experiences.push({
+                id: generateId(),
+                text,
+                struck: false
+            });
+
             input.value = '';
             saveData();
             renderAll();
@@ -231,16 +326,28 @@
 
         function toggleExpStrike(memId, expId) {
             const memory = data.memories.find(m => m.id === memId);
-            if (!memory) return;
+
+            if (!memory) {
+                return;
+            }
+
             const exp = memory.experiences.find(e => e.id === expId);
-            if (exp) exp.struck = !exp.struck;
+
+            if (exp) {
+                exp.struck = !exp.struck;
+            }
+
             saveData();
             renderAll();
         }
 
         function strikeMemory(memId) {
             const memory = data.memories.find(m => m.id === memId);
-            if (!memory) return;
+
+            if (!memory) {
+                return;
+            }
+
             memory.struck = !memory.struck;
             saveData();
             renderAll();
@@ -248,54 +355,91 @@
 
         function turnToDiary(memId) {
             const idx = data.memories.findIndex(m => m.id === memId);
-            if (idx === -1) return;
+
+            if (idx === -1) {
+                return;
+            }
+
             const memory = data.memories[idx];
             const activeDiary = data.diary.filter(d => !d.struck).length;
+
             if (activeDiary >= 4) {
                 alert("Diary can only hold 4 active entries.");
                 return;
             }
+
             data.diary.push(memory);
             data.memories.splice(idx, 1);
+
             saveData();
             renderAll();
+        }
+
+        function updateMemoryName(memId, value) {
+            const memory = data.memories.find(m => m.id === memId);
+
+            if (!memory) {
+                return;
+            }
+
+            memory.name = value;
+            saveData();
         }
 
         function renderMemories() {
             const container = document.getElementById('memories-container');
             const activeCount = data.memories.filter(m => !m.struck).length;
+
             document.getElementById('memory-count').textContent = `(${activeCount}/5 active)`;
 
             container.innerHTML = data.memories.map(mem => `
-                <div class="memory-card bg-[#1a1111] p-6 rounded-none ${mem.struck ? 'struck' : ''}">
-                    <div class="flex justify-between items-center mb-4">
-                        <input type="text" value="${mem.name}" 
-                               onblur="data.memories.find(m=>m.id==='${mem.id}').name=this.value;saveData();"
-                               class="bg-transparent border-b-2 border-[#9c1c1c] focus:border-[#e63939] text-2xl flex-1 outline-none">
-                        <div class="flex gap-3">
-                            <button onclick="strikeMemory('${mem.id}')" 
-                                    class="text-sm px-4 py-2 border border-[#9c1c1c] hover:bg-[#9c1c1c] hover:text-white">STRIKE</button>
-                            <button onclick="turnToDiary('${mem.id}')" 
-                                    class="text-sm px-4 py-2 border border-[#9c1c1c] hover:bg-[#9c1c1c] hover:text-white">TO DIARY</button>
-                            <button onclick="deleteItem('memories', '${mem.id}')" 
-                                    class="text-[#9f7a7a] hover:text-[#e63939] text-3xl">×</button>
+                <div class="memory-card bg-[#1a1111] p-6 rounded-none ${mem.struck ? 'struck-card' : ''}">
+                    <div class="flex justify-between items-center mb-4 gap-4">
+                        <input type="text"
+                               value="${escapeAttribute(mem.name)}"
+                               onblur="updateMemoryName('${mem.id}', this.value)"
+                               class="bg-transparent border-b-2 border-[#9c1c1c] focus:border-[#e63939] text-2xl flex-1 outline-none ${mem.struck ? 'struck-text' : ''}">
+
+                        <div class="flex gap-3 ml-auto">
+                            <button onclick="strikeMemory('${mem.id}')"
+                                    class="text-sm px-4 py-2 border border-[#9c1c1c] hover:bg-[#9c1c1c] hover:text-white">
+                                ${mem.struck ? 'UNSTRIKE' : 'STRIKE'}
+                            </button>
+
+                            <button onclick="turnToDiary('${mem.id}')"
+                                    class="text-sm px-4 py-2 border border-[#9c1c1c] hover:bg-[#9c1c1c] hover:text-white">
+                                TO DIARY
+                            </button>
+
+                            <button onclick="deleteItem('memories', '${mem.id}')"
+                                    class="text-[#9f7a7a] hover:text-[#e63939] text-3xl">
+                                ×
+                            </button>
                         </div>
                     </div>
-                    
+
                     <div class="pl-4 border-l-2 border-[#9c1c1c] mb-4">
                         <div class="flex gap-2 mb-3">
-                            <input id="exp-input-${mem.id}" type="text" placeholder="new experience..." 
+                            <input id="exp-input-${mem.id}" type="text" placeholder="new experience..."
                                    class="flex-1 bg-[#0f0a0a] border border-[#9c1c1c] p-3 outline-none text-sm">
-                            <button onclick="addExperience('${mem.id}')" 
-                                    class="bg-[#9c1c1c] hover:bg-[#e63939] px-6 text-xs font-bold">ADD</button>
+                            <button onclick="addExperience('${mem.id}')"
+                                    class="bg-[#9c1c1c] hover:bg-[#e63939] px-6 text-xs font-bold">
+                                ADD
+                            </button>
                         </div>
+
                         <ul class="space-y-2">
-                            ${mem.experiences.map(exp => `
-                                <li onclick="toggleExpStrike('${mem.id}', '${exp.id}')" 
-                                    class="flex justify-between items-center bg-[#0f0a0a] p-3 text-sm cursor-pointer ${exp.struck ? 'struck' : ''}">
-                                    <span>${exp.text}</span>
-                                    <button onclick="event.stopImmediatePropagation(); deleteItem('memories', '${mem.id}');" 
-                                            class="text-[#9f7a7a] hover:text-[#e63939]">×</button>
+                            ${(mem.experiences || []).map(exp => `
+                                <li class="flex justify-between items-center bg-[#0f0a0a] p-3 text-sm">
+                                    <button onclick="toggleExpStrike('${mem.id}', '${exp.id}')"
+                                            class="text-left flex-1 ${exp.struck ? 'struck-text' : ''}">
+                                        ${escapeHtml(exp.text)}
+                                    </button>
+
+                                    <button onclick="deleteExperience('${mem.id}', '${exp.id}')"
+                                            class="ml-3 text-[#9f7a7a] hover:text-[#e63939]">
+                                        ×
+                                    </button>
                                 </li>
                             `).join('')}
                         </ul>
@@ -307,24 +451,36 @@
         function renderDiary() {
             const container = document.getElementById('diary-container');
             const activeCount = data.diary.filter(d => !d.struck).length;
+
             document.getElementById('diary-count').textContent = `(${activeCount}/4)`;
 
             container.innerHTML = data.diary.map(diary => `
-                <div class="diary-card bg-[#1a1111] p-6 rounded-none ${diary.struck ? 'struck' : ''}">
-                    <div class="flex justify-between items-center mb-4">
-                        <div class="text-2xl">${diary.name}</div>
-                        <div class="flex gap-3">
-                            <button onclick="toggleStrike('diary', '${diary.id}')" 
-                                    class="text-sm px-4 py-2 border border-[#9c1c1c] hover:bg-[#9c1c1c] hover:text-white">STRIKE</button>
-                            <button onclick="deleteItem('diary', '${diary.id}')" 
-                                    class="text-[#9f7a7a] hover:text-[#e63939] text-3xl">×</button>
+                <div class="diary-card bg-[#1a1111] p-6 rounded-none ${diary.struck ? 'struck-card' : ''}">
+                    <div class="flex justify-between items-center mb-4 gap-4">
+                        <div class="text-2xl flex-1 ${diary.struck ? 'struck-text' : ''}">
+                            ${escapeHtml(diary.name)}
+                        </div>
+
+                        <div class="flex gap-3 ml-auto">
+                            <button onclick="toggleStrike('diary', '${diary.id}')"
+                                    class="text-sm px-4 py-2 border border-[#9c1c1c] hover:bg-[#9c1c1c] hover:text-white">
+                                ${diary.struck ? 'UNSTRIKE' : 'STRIKE'}
+                            </button>
+
+                            <button onclick="deleteItem('diary', '${diary.id}')"
+                                    class="text-[#9f7a7a] hover:text-[#e63939] text-3xl">
+                                ×
+                            </button>
                         </div>
                     </div>
+
                     <div class="pl-4 border-l-2 border-[#9c1c1c]">
                         <ul class="space-y-2 text-sm">
-                            ${diary.experiences.map(exp => `
-                                <li class="flex justify-between bg-[#0f0a0a] p-3 ${exp.struck ? 'struck' : ''}">
-                                    <span>${exp.text}</span>
+                            ${(diary.experiences || []).map(exp => `
+                                <li class="flex justify-between bg-[#0f0a0a] p-3">
+                                    <span class="${exp.struck ? 'struck-text' : ''}">
+                                        ${escapeHtml(exp.text)}
+                                    </span>
                                 </li>
                             `).join('')}
                         </ul>
@@ -342,16 +498,25 @@
             renderDiary();
         }
 
-        // Init
         window.onload = function() {
             loadData();
             renderAll();
 
-            // Live name save
             const nameInput = document.getElementById('name-input');
+
             nameInput.addEventListener('input', () => {
                 data.name = nameInput.value;
                 saveData();
+            });
+
+            ['skills', 'resources', 'characters', 'marks'].forEach(listName => {
+                const input = document.getElementById(listName + '-input');
+
+                input.addEventListener('keydown', event => {
+                    if (event.key === 'Enter') {
+                        addItem(listName);
+                    }
+                });
             });
         };
     </script>
