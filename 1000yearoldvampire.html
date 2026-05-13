@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thousand Year Old Vampire</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Cinzel:wght@400;700&display=swap');
+        body {
+            background: linear-gradient(to bottom, #0a0606, #1a0f0f);
+            font-family: 'Cinzel', serif;
+        }
+        .title {
+            font-family: 'UnifrakturMaguntia', cursive;
+        }
+        .struck {
+            text-decoration: line-through;
+            opacity: 0.45;
+            color: #9f7a7a;
+        }
+        .section-header {
+            border-bottom: 3px solid #9c1c1c;
+        }
+        .memory-card, .diary-card {
+            transition: all 0.3s ease;
+            border: 2px solid #9c1c1c;
+        }
+        .memory-card:hover, .diary-card:hover {
+            box-shadow: 0 0 15px #9c1c1c;
+        }
+    </style>
+</head>
+<body class="text-[#e8d5c0] min-h-screen pb-12">
+    <div class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="title text-7xl text-[#9c1c1c] tracking-widest drop-shadow-md">THOUSAND YEAR OLD VAMPIRE</h1>
+            <p class="text-[#9f7a7a] text-xl italic mt-2">the blood remembers... until it doesn't</p>
+        </div>
+
+        <!-- Name -->
+        <div class="mb-10">
+            <label class="block text-[#9f7a7a] text-lg mb-2 tracking-wider">YOUR NAME</label>
+            <input id="name-input" 
+                   type="text" 
+                   class="w-full max-w-lg bg-[#1a1111] border-2 border-[#9c1c1c] focus:border-[#e63939] text-3xl p-5 outline-none rounded-none">
+        </div>
+
+        <!-- Four Lists: Skills, Resources, Characters, Marks -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+            <!-- Skills -->
+            <div>
+                <h2 class="section-header text-3xl text-[#9c1c1c] pb-3 mb-4">SKILLS</h2>
+                <div class="flex gap-2 mb-4">
+                    <input id="skills-input" type="text" placeholder="new skill..." 
+                           class="flex-1 bg-[#1a1111] border border-[#9c1c1c] p-4 text-lg outline-none">
+                    <button onclick="addItem('skills')" 
+                            class="bg-[#9c1c1c] hover:bg-[#e63939] px-8 text-white font-bold">ADD</button>
+                </div>
+                <ul id="skills-list" class="space-y-3 min-h-[200px]"></ul>
+            </div>
+
+            <!-- Resources -->
+            <div>
+                <h2 class="section-header text-3xl text-[#9c1c1c] pb-3 mb-4">RESOURCES</h2>
+                <div class="flex gap-2 mb-4">
+                    <input id="resources-input" type="text" placeholder="new resource..." 
+                           class="flex-1 bg-[#1a1111] border border-[#9c1c1c] p-4 text-lg outline-none">
+                    <button onclick="addItem('resources')" 
+                            class="bg-[#9c1c1c] hover:bg-[#e63939] px-8 text-white font-bold">ADD</button>
+                </div>
+                <ul id="resources-list" class="space-y-3 min-h-[200px]"></ul>
+            </div>
+
+            <!-- Characters -->
+            <div>
+                <h2 class="section-header text-3xl text-[#9c1c1c] pb-3 mb-4">CHARACTERS</h2>
+                <div class="flex gap-2 mb-4">
+                    <input id="characters-input" type="text" placeholder="new character..." 
+                           class="flex-1 bg-[#1a1111] border border-[#9c1c1c] p-4 text-lg outline-none">
+                    <button onclick="addItem('characters')" 
+                            class="bg-[#9c1c1c] hover:bg-[#e63939] px-8 text-white font-bold">ADD</button>
+                </div>
+                <ul id="characters-list" class="space-y-3 min-h-[200px]"></ul>
+            </div>
+
+            <!-- Marks -->
+            <div>
+                <h2 class="section-header text-3xl text-[#9c1c1c] pb-3 mb-4">MARKS</h2>
+                <div class="flex gap-2 mb-4">
+                    <input id="marks-input" type="text" placeholder="new mark..." 
+                           class="flex-1 bg-[#1a1111] border border-[#9c1c1c] p-4 text-lg outline-none">
+                    <button onclick="addItem('marks')" 
+                            class="bg-[#9c1c1c] hover:bg-[#e63939] px-8 text-white font-bold">ADD</button>
+                </div>
+                <ul id="marks-list" class="space-y-3 min-h-[200px]"></ul>
+            </div>
+        </div>
+
+        <!-- Memories -->
+        <div class="mb-16">
+            <div class="flex justify-between items-baseline mb-6">
+                <h2 class="text-4xl text-[#9c1c1c] title">MEMORIES <span id="memory-count" class="text-[#e63939] text-2xl">(0/5 active)</span></h2>
+                <button onclick="addMemory()" 
+                        class="bg-[#1a1111] border-2 border-[#9c1c1c] hover:border-[#e63939] px-8 py-4 text-xl font-bold">+ NEW MEMORY</button>
+            </div>
+            <div id="memories-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+        </div>
+
+        <!-- Diary -->
+        <div>
+            <div class="flex justify-between items-baseline mb-6">
+                <h2 class="text-4xl text-[#9c1c1c] title">DIARY <span id="diary-count" class="text-[#e63939] text-2xl">(0/4)</span></h2>
+            </div>
+            <div id="diary-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+        </div>
+    </div>
+
+    <script>
+        let data = {
+            name: "",
+            skills: [],
+            resources: [],
+            characters: [],
+            marks: [],
+            memories: [], // {id, name, struck, experiences: [{id, text, struck}]}
+            diary: []     // same structure as memories
+        };
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('tyov-sheet');
+            if (saved) {
+                data = JSON.parse(saved);
+            }
+            document.getElementById('name-input').value = data.name || '';
+        }
+
+        function saveData() {
+            localStorage.setItem('tyov-sheet', JSON.stringify(data));
+        }
+
+        function toggleStrike(listName, itemId) {
+            if (listName === 'memories' || listName === 'diary') {
+                const list = listName === 'memories' ? data.memories : data.diary;
+                const item = list.find(i => i.id === itemId);
+                if (item) item.struck = !item.struck;
+            } else {
+                const list = data[listName];
+                const item = list.find(i => i.id === itemId);
+                if (item) item.struck = !item.struck;
+            }
+            saveData();
+            renderAll();
+        }
+
+        function deleteItem(listName, itemId) {
+            if (listName === 'memories' || listName === 'diary') {
+                const list = listName === 'memories' ? data.memories : data.diary;
+                const idx = list.findIndex(i => i.id === itemId);
+                if (idx > -1) list.splice(idx, 1);
+            } else {
+                data[listName] = data[listName].filter(i => i.id !== itemId);
+            }
+            saveData();
+            renderAll();
+        }
+
+        function addItem(listName) {
+            const input = document.getElementById(listName + '-input');
+            const text = input.value.trim();
+            if (!text) return;
+            data[listName].push({ id: generateId(), text, struck: false });
+            input.value = '';
+            saveData();
+            renderAll();
+        }
+
+        function renderList(listName) {
+            const container = document.getElementById(listName + '-list');
+            if (!container) return;
+            container.innerHTML = data[listName].map(item => `
+                <li onclick="toggleStrike('${listName}', '${item.id}')" 
+                    class="flex justify-between items-center bg-[#1a1111] border border-[#9c1c1c] p-4 cursor-pointer group ${item.struck ? 'struck' : ''}">
+                    <span class="text-lg">${item.text}</span>
+                    <button onclick="event.stopImmediatePropagation(); deleteItem('${listName}', '${item.id}');" 
+                            class="text-[#9f7a7a] hover:text-[#e63939] text-2xl leading-none opacity-0 group-hover:opacity-100">×</button>
+                </li>
+            `).join('');
+        }
+
+        function addMemory() {
+            const active = data.memories.filter(m => !m.struck).length;
+            if (active >= 5) {
+                alert("You have reached the limit of 5 active memories.");
+                return;
+            }
+            data.memories.push({
+                id: generateId(),
+                name: "New Memory",
+                struck: false,
+                experiences: []
+            });
+            saveData();
+            renderAll();
+        }
+
+        function addExperience(memId) {
+            const memory = data.memories.find(m => m.id === memId);
+            if (!memory) return;
+            const inputId = `exp-input-${memId}`;
+            const input = document.getElementById(inputId);
+            const text = input ? input.value.trim() : '';
+            if (!text) return;
+            memory.experiences.push({ id: generateId(), text, struck: false });
+            input.value = '';
+            saveData();
+            renderAll();
+        }
+
+        function toggleExpStrike(memId, expId) {
+            const memory = data.memories.find(m => m.id === memId);
+            if (!memory) return;
+            const exp = memory.experiences.find(e => e.id === expId);
+            if (exp) exp.struck = !exp.struck;
+            saveData();
+            renderAll();
+        }
+
+        function strikeMemory(memId) {
+            const memory = data.memories.find(m => m.id === memId);
+            if (!memory) return;
+            memory.struck = !memory.struck;
+            saveData();
+            renderAll();
+        }
+
+        function turnToDiary(memId) {
+            const idx = data.memories.findIndex(m => m.id === memId);
+            if (idx === -1) return;
+            const memory = data.memories[idx];
+            const activeDiary = data.diary.filter(d => !d.struck).length;
+            if (activeDiary >= 4) {
+                alert("Diary can only hold 4 active entries.");
+                return;
+            }
+            data.diary.push(memory);
+            data.memories.splice(idx, 1);
+            saveData();
+            renderAll();
+        }
+
+        function renderMemories() {
+            const container = document.getElementById('memories-container');
+            const activeCount = data.memories.filter(m => !m.struck).length;
+            document.getElementById('memory-count').textContent = `(${activeCount}/5 active)`;
+
+            container.innerHTML = data.memories.map(mem => `
+                <div class="memory-card bg-[#1a1111] p-6 rounded-none ${mem.struck ? 'struck' : ''}">
+                    <div class="flex justify-between items-center mb-4">
+                        <input type="text" value="${mem.name}" 
+                               onblur="data.memories.find(m=>m.id==='${mem.id}').name=this.value;saveData();"
+                               class="bg-transparent border-b-2 border-[#9c1c1c] focus:border-[#e63939] text-2xl flex-1 outline-none">
+                        <div class="flex gap-3">
+                            <button onclick="strikeMemory('${mem.id}')" 
+                                    class="text-sm px-4 py-2 border border-[#9c1c1c] hover:bg-[#9c1c1c] hover:text-white">STRIKE</button>
+                            <button onclick="turnToDiary('${mem.id}')" 
+                                    class="text-sm px-4 py-2 border border-[#9c1c1c] hover:bg-[#9c1c1c] hover:text-white">TO DIARY</button>
+                            <button onclick="deleteItem('memories', '${mem.id}')" 
+                                    class="text-[#9f7a7a] hover:text-[#e63939] text-3xl">×</button>
+                        </div>
+                    </div>
+                    
+                    <div class="pl-4 border-l-2 border-[#9c1c1c] mb-4">
+                        <div class="flex gap-2 mb-3">
+                            <input id="exp-input-${mem.id}" type="text" placeholder="new experience..." 
+                                   class="flex-1 bg-[#0f0a0a] border border-[#9c1c1c] p-3 outline-none text-sm">
+                            <button onclick="addExperience('${mem.id}')" 
+                                    class="bg-[#9c1c1c] hover:bg-[#e63939] px-6 text-xs font-bold">ADD</button>
+                        </div>
+                        <ul class="space-y-2">
+                            ${mem.experiences.map(exp => `
+                                <li onclick="toggleExpStrike('${mem.id}', '${exp.id}')" 
+                                    class="flex justify-between items-center bg-[#0f0a0a] p-3 text-sm cursor-pointer ${exp.struck ? 'struck' : ''}">
+                                    <span>${exp.text}</span>
+                                    <button onclick="event.stopImmediatePropagation(); deleteItem('memories', '${mem.id}');" 
+                                            class="text-[#9f7a7a] hover:text-[#e63939]">×</button>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderDiary() {
+            const container = document.getElementById('diary-container');
+            const activeCount = data.diary.filter(d => !d.struck).length;
+            document.getElementById('diary-count').textContent = `(${activeCount}/4)`;
+
+            container.innerHTML = data.diary.map(diary => `
+                <div class="diary-card bg-[#1a1111] p-6 rounded-none ${diary.struck ? 'struck' : ''}">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="text-2xl">${diary.name}</div>
+                        <div class="flex gap-3">
+                            <button onclick="toggleStrike('diary', '${diary.id}')" 
+                                    class="text-sm px-4 py-2 border border-[#9c1c1c] hover:bg-[#9c1c1c] hover:text-white">STRIKE</button>
+                            <button onclick="deleteItem('diary', '${diary.id}')" 
+                                    class="text-[#9f7a7a] hover:text-[#e63939] text-3xl">×</button>
+                        </div>
+                    </div>
+                    <div class="pl-4 border-l-2 border-[#9c1c1c]">
+                        <ul class="space-y-2 text-sm">
+                            ${diary.experiences.map(exp => `
+                                <li class="flex justify-between bg-[#0f0a0a] p-3 ${exp.struck ? 'struck' : ''}">
+                                    <span>${exp.text}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderAll() {
+            renderList('skills');
+            renderList('resources');
+            renderList('characters');
+            renderList('marks');
+            renderMemories();
+            renderDiary();
+        }
+
+        // Init
+        window.onload = function() {
+            loadData();
+            renderAll();
+
+            // Live name save
+            const nameInput = document.getElementById('name-input');
+            nameInput.addEventListener('input', () => {
+                data.name = nameInput.value;
+                saveData();
+            });
+        };
+    </script>
+</body>
+</html>
