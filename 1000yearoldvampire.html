@@ -484,11 +484,12 @@ function renderList(listName) {
 
     container.innerHTML = data[listName].map(item => `
         <li class="list-item flex gap-3 items-stretch">
-            <div class="flex-1 bg-[#1a1111] border border-[#9c1c1c] p-4 flex items-center min-h-[58px]">
-                <input type="text"
-                       value="${escapeAttribute(item.text)}"
-                       onblur="updateListItemText('${listName}', '${item.id}', this.value)"
-                       class="w-full bg-transparent outline-none text-lg ${item.struck ? 'struck-text' : ''}">
+            <div class="flex-1 bg-[#1a1111] border border-[#9c1c1c] p-4 flex items-start min-h-[58px]">
+                <textarea
+                    onblur="updateListItemText('${listName}', '${item.id}', this.value)"
+                    oninput="autoResizeTextarea(this)"
+                    class="w-full bg-transparent outline-none text-lg resize-none overflow-hidden leading-relaxed min-h-[32px] ${item.struck ? 'struck-text' : ''}"
+                    rows="1">${escapeHtml(item.text)}</textarea>
             </div>
 
             <button onclick="toggleStrike('${listName}', '${item.id}');"
@@ -497,6 +498,13 @@ function renderList(listName) {
             </button>
         </li>
     `).join('');
+
+    container.querySelectorAll('textarea').forEach(autoResizeTextarea);
+}
+        
+function autoResizeTextarea(textarea) {
+    textarea.style.height = 'auto';
+    textarea.style.height = textarea.scrollHeight + 'px';
 }
 
         function addMemory() {
