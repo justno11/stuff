@@ -43,6 +43,32 @@
         .list-item {
             transition: all 0.2s ease;
         }
+
+        .gothic-button {
+            background: #1a1111;
+            border: 2px solid #9c1c1c;
+            color: #e8d5c0;
+            font-weight: bold;
+            letter-spacing: 0.05em;
+        }
+
+        .gothic-button:hover {
+            border-color: #e63939;
+            color: #ffffff;
+        }
+
+        .danger-button {
+            background: #3a0d0d;
+            border: 2px solid #9c1c1c;
+            color: #e8d5c0;
+            font-weight: bold;
+            letter-spacing: 0.05em;
+        }
+
+        .danger-button:hover {
+            background: #9c1c1c;
+            color: #ffffff;
+        }
     </style>
 </head>
 
@@ -55,12 +81,38 @@
             <p class="text-[#9f7a7a] text-xl italic mt-2">the blood remembers... until it doesn't</p>
         </div>
 
-        <!-- Name -->
+        <!-- Name / Sheet Controls -->
         <div class="mb-10">
             <label class="block text-[#9f7a7a] text-lg mb-2 tracking-wider">YOUR NAME</label>
-            <input id="name-input"
-                   type="text"
-                   class="w-full max-w-lg bg-[#1a1111] border-2 border-[#9c1c1c] focus:border-[#e63939] text-3xl p-5 outline-none rounded-none">
+
+            <div class="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center">
+                <input id="name-input"
+                       type="text"
+                       class="w-full lg:max-w-lg bg-[#1a1111] border-2 border-[#9c1c1c] focus:border-[#e63939] text-3xl p-5 outline-none rounded-none">
+
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button onclick="startNewSheet()"
+                            class="danger-button px-6 py-4 text-sm sm:text-base">
+                        START NEW
+                    </button>
+
+                    <button onclick="exportJson()"
+                            class="gothic-button px-6 py-4 text-sm sm:text-base">
+                        EXPORT JSON
+                    </button>
+
+                    <button onclick="triggerImportJson()"
+                            class="gothic-button px-6 py-4 text-sm sm:text-base">
+                        IMPORT JSON
+                    </button>
+
+                    <input id="json-import-input"
+                           type="file"
+                           accept=".json,application/json"
+                           class="hidden"
+                           onchange="importJson(event)">
+                </div>
+            </div>
         </div>
 
         <!-- Four Lists – two rows -->
@@ -139,7 +191,7 @@
     </div>
 
     <script>
-        let data = {
+        const emptySheet = {
             name: "",
             skills: [],
             resources: [],
@@ -148,6 +200,12 @@
             memories: [],
             diary: []
         };
+
+        let data = createEmptySheet();
+
+        function createEmptySheet() {
+            return JSON.parse(JSON.stringify(emptySheet));
+        }
 
         function generateId() {
             return Date.now().toString(36) + Math.random().toString(36).substr(2);
@@ -166,26 +224,165 @@
             return escapeHtml(value);
         }
 
+        function normalizeBasicItem(item) {
+            return {
+                id: item && item.id ? String(item.id) : generateId(),
+                text: item && item.text ? String(item.text) : "",
+                struck: Boolean(item && item.struck)
+            };
+        }
+
+        function normalizeExperience(exp) {
+            return {
+                id: exp && exp.id ? String(exp.id) : generateId(),
+                text: exp && exp.text ? String(exp.text) : "",
+                struck: Boolean(exp && exp.struck)
+            };
+        }
+
+        function normalizeMemory(memory) {
+            return {
+                id: memory && memory.id ? String(memory.id) : generateId(),
+                name: memory && memory.name ? String(memory.name) : "New Memory",
+                struck: Boolean(memory && memory.struck),
+                experiences: Array.isArray(memory && memory.experiences)
+                    ? memory.experiences.map(normalizeExperience)
+                    : []
+            };
+        }
+
+        function normalizeSheet(rawData) {
+            const normalized = createEmptySheet();
+
+            normalized.name = rawData && rawData.name ? String(rawData.name) : "";
+
+            normalized.skills = Array.isArray(rawData && rawData.skills)
+                ? rawData.skills.map(normalizeBasicItem)
+                : [];
+
+            normalized.resources = Array.isArray(rawData && rawData.resources)
+                ? rawData.resources.map(normalizeBasicItem)
+                : [];
+
+            normalized.characters = Array.isArray(rawData && rawData.characters)
+                ? rawData.characters.map(normalizeBasicItem)
+                : [];
+
+            normalized.marks = Array.isArray(rawData && rawData.marks)
+                ? rawData.marks.map(normalizeBasicItem)
+                : [];
+
+            normalized.memories = Array.isArray(rawData && rawData.memories)
+                ? rawData.memories.map(normalizeMemory)
+                : [];
+
+            normalized.diary = Array.isArray(rawData && rawData.diary)
+                ? rawData.diary.map(normalizeMemory)
+                : [];
+
+            return normalized;
+        }
+
         function loadData() {
             const saved = localStorage.getItem('tyov-sheet');
 
             if (saved) {
-                data = JSON.parse(saved);
+                try {
+                    data = normalizeSheet(JSON.parse(saved));
+                } catch (error) {
+                    console.error("Could not load saved sheet.", error);
+                    data = createEmptySheet();
+                }
+            } else {
+                data = createEmptySheet();
             }
-
-            data.name = data.name || "";
-            data.skills = data.skills || [];
-            data.resources = data.resources || [];
-            data.characters = data.characters || [];
-            data.marks = data.marks || [];
-            data.memories = data.memories || [];
-            data.diary = data.diary || [];
 
             document.getElementById('name-input').value = data.name || '';
         }
 
         function saveData() {
             localStorage.setItem('tyov-sheet', JSON.stringify(data));
+        }
+
+        function startNewSheet() {
+            const confirmed = confirm("Start a new sheet? This will clear the current view and overwrite the browser autosave.");
+
+            if (!confirmed) {
+                return;
+            }
+
+            data = createEmptySheet();
+            saveData();
+            clearEntryInputs();
+            document.getElementById('name-input').value = "";
+            renderAll();
+        }
+
+        function clearEntryInputs() {
+            ['skills', 'resources', 'characters', 'marks'].forEach(listName => {
+                const input = document.getElementById(listName + '-input');
+
+                if (input) {
+                    input.value = "";
+                }
+            });
+        }
+
+        function exportJson() {
+            const exportData = JSON.stringify(data, null, 2);
+            const blob = new Blob([exportData], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+
+            const safeName = data.name
+                ? data.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")
+                : "thousand-year-old-vampire";
+
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `${safeName || "thousand-year-old-vampire"}-sheet.json`;
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            URL.revokeObjectURL(url);
+        }
+
+        function triggerImportJson() {
+            const input = document.getElementById('json-import-input');
+            input.value = "";
+            input.click();
+        }
+
+        function importJson(event) {
+            const file = event.target.files && event.target.files[0];
+
+            if (!file) {
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = function(loadEvent) {
+                try {
+                    const imported = JSON.parse(loadEvent.target.result);
+                    data = normalizeSheet(imported);
+                    saveData();
+
+                    document.getElementById('name-input').value = data.name || "";
+                    clearEntryInputs();
+                    renderAll();
+                } catch (error) {
+                    console.error("Could not import JSON.", error);
+                    alert("That JSON file could not be imported. Make sure it is a valid exported sheet.");
+                }
+            };
+
+            reader.onerror = function() {
+                alert("The JSON file could not be read.");
+            };
+
+            reader.readAsText(file);
         }
 
         function toggleStrike(listName, itemId) {
@@ -269,10 +466,15 @@
             }
 
             container.innerHTML = data[listName].map(item => `
-                <li class="list-item flex items-center bg-[#1a1111] border border-[#9c1c1c] p-4">
-                    <span class="text-lg flex-1 ${item.struck ? 'struck-text' : ''}">${escapeHtml(item.text)}</span>
-                    <button onclick="event.stopImmediatePropagation(); toggleStrike('${listName}', '${item.id}');"
-                            class="ml-auto text-sm px-6 py-2 border border-[#9c1c1c] hover:bg-[#9c1c1c] hover:text-white font-bold">
+                <li class="list-item flex gap-3 items-stretch">
+                    <div class="flex-1 bg-[#1a1111] border border-[#9c1c1c] p-4 flex items-center min-h-[58px]">
+                        <span class="text-lg ${item.struck ? 'struck-text' : ''}">
+                            ${escapeHtml(item.text)}
+                        </span>
+                    </div>
+
+                    <button onclick="toggleStrike('${listName}', '${item.id}');"
+                            class="bg-[#1a1111] border border-[#9c1c1c] hover:bg-[#9c1c1c] hover:text-white text-sm px-4 sm:px-6 font-bold min-w-[110px]">
                         ${item.struck ? 'UNSTRIKE' : 'STRIKE'}
                     </button>
                 </li>
