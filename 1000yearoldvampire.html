@@ -16,8 +16,9 @@
         }
         .struck {
             text-decoration: line-through;
-            opacity: 0.45;
+            opacity: 0.4;
             color: #9f7a7a;
+            pointer-events: none;
         }
         .section-header {
             border-bottom: 3px solid #9c1c1c;
@@ -28,6 +29,9 @@
         }
         .memory-card:hover, .diary-card:hover {
             box-shadow: 0 0 15px #9c1c1c;
+        }
+        .list-item {
+            transition: all 0.2s ease;
         }
     </style>
 </head>
@@ -47,52 +51,53 @@
                    class="w-full max-w-lg bg-[#1a1111] border-2 border-[#9c1c1c] focus:border-[#e63939] text-3xl p-5 outline-none rounded-none">
         </div>
 
-        <!-- Four Lists: Skills, Resources, Characters, Marks -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-            <!-- Skills -->
+        <!-- Four Lists – two rows -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+
+            <!-- Row 1 Left: Skills -->
             <div>
                 <h2 class="section-header text-3xl text-[#9c1c1c] pb-3 mb-4">SKILLS</h2>
-                <div class="flex gap-2 mb-4">
+                <div class="flex gap-3 mb-6">
                     <input id="skills-input" type="text" placeholder="new skill..." 
                            class="flex-1 bg-[#1a1111] border border-[#9c1c1c] p-4 text-lg outline-none">
                     <button onclick="addItem('skills')" 
-                            class="bg-[#9c1c1c] hover:bg-[#e63939] px-8 text-white font-bold">ADD</button>
+                            class="bg-[#9c1c1c] hover:bg-[#e63939] w-12 flex items-center justify-center text-3xl leading-none text-white">+</button>
                 </div>
                 <ul id="skills-list" class="space-y-3 min-h-[200px]"></ul>
             </div>
 
-            <!-- Resources -->
+            <!-- Row 1 Right: Resources -->
             <div>
                 <h2 class="section-header text-3xl text-[#9c1c1c] pb-3 mb-4">RESOURCES</h2>
-                <div class="flex gap-2 mb-4">
+                <div class="flex gap-3 mb-6">
                     <input id="resources-input" type="text" placeholder="new resource..." 
                            class="flex-1 bg-[#1a1111] border border-[#9c1c1c] p-4 text-lg outline-none">
                     <button onclick="addItem('resources')" 
-                            class="bg-[#9c1c1c] hover:bg-[#e63939] px-8 text-white font-bold">ADD</button>
+                            class="bg-[#9c1c1c] hover:bg-[#e63939] w-12 flex items-center justify-center text-3xl leading-none text-white">+</button>
                 </div>
                 <ul id="resources-list" class="space-y-3 min-h-[200px]"></ul>
             </div>
 
-            <!-- Characters -->
+            <!-- Row 2 Left: Characters -->
             <div>
                 <h2 class="section-header text-3xl text-[#9c1c1c] pb-3 mb-4">CHARACTERS</h2>
-                <div class="flex gap-2 mb-4">
+                <div class="flex gap-3 mb-6">
                     <input id="characters-input" type="text" placeholder="new character..." 
                            class="flex-1 bg-[#1a1111] border border-[#9c1c1c] p-4 text-lg outline-none">
                     <button onclick="addItem('characters')" 
-                            class="bg-[#9c1c1c] hover:bg-[#e63939] px-8 text-white font-bold">ADD</button>
+                            class="bg-[#9c1c1c] hover:bg-[#e63939] w-12 flex items-center justify-center text-3xl leading-none text-white">+</button>
                 </div>
                 <ul id="characters-list" class="space-y-3 min-h-[200px]"></ul>
             </div>
 
-            <!-- Marks -->
+            <!-- Row 2 Right: Marks -->
             <div>
                 <h2 class="section-header text-3xl text-[#9c1c1c] pb-3 mb-4">MARKS</h2>
-                <div class="flex gap-2 mb-4">
+                <div class="flex gap-3 mb-6">
                     <input id="marks-input" type="text" placeholder="new mark..." 
                            class="flex-1 bg-[#1a1111] border border-[#9c1c1c] p-4 text-lg outline-none">
                     <button onclick="addItem('marks')" 
-                            class="bg-[#9c1c1c] hover:bg-[#e63939] px-8 text-white font-bold">ADD</button>
+                            class="bg-[#9c1c1c] hover:bg-[#e63939] w-12 flex items-center justify-center text-3xl leading-none text-white">+</button>
                 </div>
                 <ul id="marks-list" class="space-y-3 min-h-[200px]"></ul>
             </div>
@@ -164,7 +169,8 @@
                 const idx = list.findIndex(i => i.id === itemId);
                 if (idx > -1) list.splice(idx, 1);
             } else {
-                data[listName] = data[listName].filter(i => i.id !== itemId);
+                // no delete for the four lists anymore
+                return;
             }
             saveData();
             renderAll();
@@ -184,11 +190,12 @@
             const container = document.getElementById(listName + '-list');
             if (!container) return;
             container.innerHTML = data[listName].map(item => `
-                <li onclick="toggleStrike('${listName}', '${item.id}')" 
-                    class="flex justify-between items-center bg-[#1a1111] border border-[#9c1c1c] p-4 cursor-pointer group ${item.struck ? 'struck' : ''}">
+                <li class="list-item flex justify-between items-center bg-[#1a1111] border border-[#9c1c1c] p-4 ${item.struck ? 'struck' : ''}">
                     <span class="text-lg">${item.text}</span>
-                    <button onclick="event.stopImmediatePropagation(); deleteItem('${listName}', '${item.id}');" 
-                            class="text-[#9f7a7a] hover:text-[#e63939] text-2xl leading-none opacity-0 group-hover:opacity-100">×</button>
+                    <button onclick="event.stopImmediatePropagation(); toggleStrike('${listName}', '${item.id}');" 
+                            class="text-sm px-6 py-2 border border-[#9c1c1c] hover:bg-[#9c1c1c] hover:text-white font-bold">
+                        ${item.struck ? 'UNSTRIKE' : 'STRIKE'}
+                    </button>
                 </li>
             `).join('');
         }
