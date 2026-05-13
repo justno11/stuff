@@ -458,28 +458,46 @@
             renderAll();
         }
 
-        function renderList(listName) {
-            const container = document.getElementById(listName + '-list');
+        function updateListItemText(listName, itemId, value) {
+    const list = data[listName];
 
-            if (!container) {
-                return;
-            }
+    if (!Array.isArray(list)) {
+        return;
+    }
 
-            container.innerHTML = data[listName].map(item => `
-                <li class="list-item flex gap-3 items-stretch">
-                    <div class="flex-1 bg-[#1a1111] border border-[#9c1c1c] p-4 flex items-center min-h-[58px]">
-                        <span class="text-lg ${item.struck ? 'struck-text' : ''}">
-                            ${escapeHtml(item.text)}
-                        </span>
-                    </div>
+    const item = list.find(i => i.id === itemId);
 
-                    <button onclick="toggleStrike('${listName}', '${item.id}');"
-                            class="bg-[#1a1111] border border-[#9c1c1c] hover:bg-[#9c1c1c] hover:text-white text-sm px-4 sm:px-6 font-bold min-w-[110px]">
-                        ${item.struck ? 'UNSTRIKE' : 'STRIKE'}
-                    </button>
-                </li>
-            `).join('');
-        }
+    if (!item) {
+        return;
+    }
+
+    item.text = value;
+    saveData();
+}
+
+function renderList(listName) {
+    const container = document.getElementById(listName + '-list');
+
+    if (!container) {
+        return;
+    }
+
+    container.innerHTML = data[listName].map(item => `
+        <li class="list-item flex gap-3 items-stretch">
+            <div class="flex-1 bg-[#1a1111] border border-[#9c1c1c] p-4 flex items-center min-h-[58px]">
+                <input type="text"
+                       value="${escapeAttribute(item.text)}"
+                       onblur="updateListItemText('${listName}', '${item.id}', this.value)"
+                       class="w-full bg-transparent outline-none text-lg ${item.struck ? 'struck-text' : ''}">
+            </div>
+
+            <button onclick="toggleStrike('${listName}', '${item.id}');"
+                    class="bg-[#1a1111] border border-[#9c1c1c] hover:bg-[#9c1c1c] hover:text-white text-sm px-4 sm:px-6 font-bold min-w-[110px]">
+                ${item.struck ? 'UNSTRIKE' : 'STRIKE'}
+            </button>
+        </li>
+    `).join('');
+}
 
         function addMemory() {
             const active = data.memories.filter(m => !m.struck).length;
